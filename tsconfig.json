@@ -28,6 +28,6 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "next.config.js"
-  ],
+, "../../home/codespace/landingpage/app/manifest.ts"  ],
   "exclude": ["node_modules"]
 }

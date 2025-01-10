@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
   /* config options here */
   experimental: {
     ppr: true,
-    serverActions: { allowedOrigins: [ "localhost:3000", "https://friendly-space-funicular-q74vprqrx992w6j-3000.app.github.dev/", ]}
+    // serverActions: { allowedOrigins: [ "localhost:3000", "https://bug-free-invention-pj4qg57wvqh7p77-3000.app.github.dev/", ]}
   },
   images: {
     remotePatterns: [

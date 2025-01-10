@@ -1,0 +1,57 @@
+{
+  "companyName": "InternetFriends",
+  "companyNameShort": "IF Studio",
+  "headerLink": "Public work samples",
+  "companyInfo": {
+    "title": "Internet Friends Studio",
+    "address1": "Development & Marketing",
+    "address2": "Switzerland / Mexico"
+  },
+  "navigation": [
+    "Pricing",
+    "Contact"
+  ],
+  "hero": {
+    "title": "We make it easy to bring your ideas to life.",
+    "description": "By focusing on simplicity, we help automate workflows, create resources, manage tasks, and distribute content—giving your business or personal projects the tools they need to succeed." 
+  },
+  "keywords": [
+    "digital connections",
+    "online networking",
+    "simplify workflows",
+    "automate tasks",
+    "content creation services",
+    "project management tools",
+    "business solutions",
+    "personal project support",
+    "web development services",
+    "resource creation",
+    "content distribution",
+    "high-performance tools",
+    "creative solutions",
+    "brand design",
+    "business automation",
+    "digital resources",
+    "project success tools"
+  ],
+  "pricing": {
+    "title": "Affordable Plans for Every Need",
+    "description": "Choose a pricing plan that aligns with your goals. From small businesses to large enterprises, we have tailored solutions to help you grow and succeed."
+  },
+  "contact": {
+    "title": "Get in Touch with Us",
+    "description": "Have questions or need support? We’re here to help.\nReach out to us to discuss your next project or any inquiries."
+  },
+  "curriculum": {
+    "title": "Explore Our Curriculum",
+    "description": "Showcasing our expertise and skills, this section highlights the knowledge and experience we've built over years, designed to empower your next project or career advancement."
+  },
+  "samples": {
+    "title": "Discover Our Public Work Samples",
+    "description": "Explore a showcase of our creativity, problem-solving, and technical expertise.\nDive into projects that bring ideas to life, automate tasks, and deliver impactful business solutions tailored to real-world needs."
+  },
+  "siteConfig": {
+    "url": "https://internetfriends.xyz",
+    "twitterHandle": "@friends_xyz"
+  }
+}

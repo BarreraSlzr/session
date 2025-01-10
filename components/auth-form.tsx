@@ -29,7 +29,7 @@ export function AuthForm({
           name="email"
           className="bg-muted text-md md:text-sm"
           type="email"
-          placeholder="usuario@sofiasalud.com"
+          placeholder="hola@internetfriends.xyz"
           autoComplete="email"
           required
           autoFocus

@@ -1,9 +1,9 @@
 import { Suspense } from "react";
 import type { Metadata, Viewport } from "next";
-import "./globals.css";
+import "../globals.css";
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from "@vercel/speed-insights/next"
-import content from '@/app/(internetfriends)/content.json'
+import content from './content.json'
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from 'sonner';
 
