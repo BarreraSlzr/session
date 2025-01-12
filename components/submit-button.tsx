@@ -1,22 +1,26 @@
 'use client';
 
 import { useFormStatus } from 'react-dom';
-
 import { LoaderIcon } from '@/components/icons';
-
 import { Button } from './ui/button';
+
+
+type SubmitButtonProps = {
+  children: React.ReactNode
+  isSuccessful: boolean
+  id: string
+}
 
 export function SubmitButton({
   children,
   isSuccessful,
-}: {
-  children: React.ReactNode;
-  isSuccessful: boolean;
-}) {
+  id
+}: SubmitButtonProps) {
   const { pending } = useFormStatus();
 
   return (
     <Button
+      id={id}
       type={pending ? 'button' : 'submit'}
       aria-disabled={pending || isSuccessful}
       disabled={pending || isSuccessful}

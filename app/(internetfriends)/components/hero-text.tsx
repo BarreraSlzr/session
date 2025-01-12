@@ -39,7 +39,7 @@ export default function HeroText({ children = <DefaultHero />, className }: Prop
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, ease: 'easeOut' }}
-                className="relative sm:px-6 px-2 md:px-8 py-12 max-w-4xl text-white">
+                className="relative sm:px-6 px-2 md:px-8 py-12 max-w-4xl">
                 {children}
             </motion.div>
         </section>

@@ -1,7 +1,6 @@
 import type { Config } from "tailwindcss";
 
 export default {
-
 	content: [
 		"./pages/**/*.{js,ts,jsx,tsx,mdx}",
 		"./components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -52,15 +51,15 @@ export default {
 					'5': 'hsl(var(--chart-5))'
 				},
 				'brand-blue': {
-					'100': 'var(--brand-blue-100)',
-					'200': 'var(--brand-blue-200)',
-					'300': 'var(--brand-blue-300)',
-					'400': 'var(--brand-blue-400)',
-					'500': 'var(--brand-blue-500)',
-					'600': 'var(--brand-blue-600)',
-					'700': 'var(--brand-blue-700)',
-					'800': 'var(--brand-blue-800)',
-					'900': 'var(--brand-blue-900)'
+					'100': 'hsl(var(--brand-blue-100))',
+					'200': 'hsl(var(--brand-blue-200))',
+					'300': 'hsl(var(--brand-blue-300))',
+					'400': 'hsl(var(--brand-blue-400))',
+					'500': 'hsl(var(--brand-blue-500))',
+					'600': 'hsl(var(--brand-blue-600))',
+					'700': 'hsl(var(--brand-blue-700))',
+					'800': 'hsl(var(--brand-blue-800))',
+					'900': 'hsl(var(--brand-blue-900))'
 				},
 			},
 			borderRadius: {

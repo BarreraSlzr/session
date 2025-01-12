@@ -14,7 +14,7 @@ export default function Header() {
             <Link href='/'>
                 <div className="flex items-center gap-2">
                     <div className="relative overflow-hidden flex items-center h-10 w-32 rounded bg-gradient-to-br from-orange-500 to-pink-500">
-                        <div className="absolute opacity-69 inset-0 w-full h-full pointer-events-none z-0 mix-blend-color">
+                        <div className="absolute opacity-69 size-full pointer-events-none z-0 mix-blend-color">
                             <NoiseFilter className='opacity-26 mix-blend-hue' />
                             <BgGoo
                                 speed={0.2}
@@ -27,7 +27,7 @@ export default function Header() {
                         />
                         </div>
                         <Image
-                            className="select-none pointer-events-none"
+                            className="select-none pointer-events-none z-10"
                             alt={`${content.companyName}.xyz`}
                             width={600}
                             height={600}

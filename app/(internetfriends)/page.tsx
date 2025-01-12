@@ -87,37 +87,37 @@ export default function Page() {
       <CompanyInfo />
       <Navigation />
       <SocialLinks />
-      <HeroText className="min-h-fit"/>
+      <HeroText className="min-h-fit" />
       <div className="sm:p-6 p-2 md:p-8 space-y-6 py-6 rounded-b-lg bg-foreground border-2 border-brand-blue-800">
-          <div className="grid md:grid-cols-2 gap-6">
-            {mainIdeas.map((i, index) => (
-              <Link 
+        <div className="grid md:grid-cols-2 gap-6">
+          {mainIdeas.map((i, index) => (
+            <Link
               key={index}
               href={`/contact?project_scope=${i.project_scope}:`}>
-                <CustomCard  subtitle={i.subtitle} title={i.title} description={i.description} 
-                  className={`${i.className}`} gridSize={0.23}
-                  cta={
-                    <div
-                      className="flex items-center gap-1 hover:opacity-70 transition-opacity"
-                    >
-                      {i.cta_word}
-                      <ArrowUpRight className="h-4 w-4" />
-                    </div>
-                  }
-                />
-              </Link>
-            ))}
-          </div>
-          <CustomCard
-            subtitle={randomMessage.title}
-            title={randomMessage.subtitle}
-            description={randomMessage.description}
-            className="bg-gradient-to-tl from-amber-300 via-amber-300 to-secondary text-brand-blue-100"
-            gridSize={0.23}
-            cta={<EmailSubscriptionForm url={`/contact?project_scope=${randomMessage.project_scope}:`}>
-              {randomMessage.cta_word}
-            </EmailSubscriptionForm>} />
+              <CustomCard subtitle={i.subtitle} title={i.title} description={i.description}
+                className={`${i.className}`} gridSize={0.23}
+                cta={
+                  <div
+                    className="flex items-center gap-1 hover:opacity-70 transition-opacity"
+                  >
+                    {i.cta_word}
+                    <ArrowUpRight className="h-4 w-4" />
+                  </div>
+                }
+              />
+            </Link>
+          ))}
         </div>
+        <CustomCard
+          subtitle={randomMessage.title}
+          title={randomMessage.subtitle}
+          description={randomMessage.description}
+          className="bg-gradient-to-tl from-amber-300 via-amber-300 to-secondary text-brand-blue-100"
+          gridSize={0.23}
+          cta={<EmailSubscriptionForm url={`/contact?project_scope=${randomMessage.project_scope}:`}>
+            {randomMessage.cta_word}
+          </EmailSubscriptionForm>} />
+      </div>
     </main>
   );
 }
