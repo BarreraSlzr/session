@@ -1,7 +1,7 @@
 'use server'
 
-import { upsertContactSubmission } from '@/db/queries/contact'
-import { ContactFormData } from '@/db/schema'
+import { upsertContactSubmission } from '@/app/(internetfriends)/lib/db/queries/contact'
+import { ContactFormData } from '@/app/(internetfriends)/lib/db/schema'
 
 export async function submitContactForm(formData: FormData) {
   try {

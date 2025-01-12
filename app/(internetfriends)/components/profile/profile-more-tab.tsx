@@ -1,5 +1,5 @@
 import React from "react";
-import { curriculum } from "@/app/(internetfriends)/lib/curriculum/data";;
+import { curriculum } from "@/app/(internetfriends)/lib/curriculum/data";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { cardCss } from "./profile-card";

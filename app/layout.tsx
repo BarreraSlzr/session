@@ -1,11 +1,48 @@
 import { Suspense } from "react";
-import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import { Analytics } from '@vercel/analytics/react'
-import { SpeedInsights } from "@vercel/speed-insights/next"
-import content from '@/app/(internetfriends)/content.json'
+import content from '../app/(internetfriends)/content.json'
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from 'sonner';
+import type { Metadata, Viewport } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+import { Analytics } from '@vercel/analytics/react'
+import { SpeedInsights } from "@vercel/speed-insights/next"
+import "../app/(internetfriends)/globals.css";
+import GoogleAnalytics from "@/app/(internetfriends)/components/google-analytics"
+
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="en">
+      <body
+        className={`${geistSans.variable} ${geistMono.variable}`}>
+        <Toaster position="top-center" />
+        <TooltipProvider delayDuration={0}>
+          <Suspense fallback='Loading'>
+            {children}
+            <SpeedInsights />
+            <Analytics />
+            {/* <GoogleAnalytics /> */}
+          </Suspense>
+        </TooltipProvider>
+      </body>
+    </html>
+  );
+}
 
 
 export const metadata: Metadata = {
@@ -89,26 +126,3 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
 };
-
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  return (
-    <html lang="en">
-      <body className="antialiased">
-          <Toaster position="top-center" />
-          <TooltipProvider delayDuration={0}>
-            <Suspense fallback='Loading'>
-              {children}
-              <SpeedInsights />
-              <Analytics />
-              {/* <GoogleAnalytics /> */}
-            </Suspense>
-          </TooltipProvider>
-        {/* </ThemeProvider> */}
-      </body>
-    </html>
-  );
-}

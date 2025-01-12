@@ -16,7 +16,7 @@ export function EmailSubscriptionForm({url, children}: PropsWithChildren<{url: s
 
     return (
         <form onSubmit={handleSubmit} className="flex w-full items-center space-x-2">
-            <div className="relative grow">
+            <div className="relative flex-grow">
                 <Input
                     type="email"
                     placeholder="Enter your email"

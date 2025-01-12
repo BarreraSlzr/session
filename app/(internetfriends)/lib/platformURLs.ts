@@ -5,3 +5,4 @@ export const platformUrls: { [key: string]: string } = {
 }
 
 export const platformNames = Object.keys(platformUrls)
+

@@ -9,19 +9,19 @@ export const ProfileTabs = () => {
     return (
         <Tabs defaultValue="expertise">
             <TabsList>
-                <TabsTrigger className="data-[state=active]:bg-brand-blue-100" value="expertise">Job Expertise</TabsTrigger>
-                <TabsTrigger className="data-[state=active]:bg-brand-blue-100" value="skills">Skills</TabsTrigger>
+                <TabsTrigger className="data-[state=active]:bg-brand-blue-100" value="expertise">Work experience</TabsTrigger>
                 <TabsTrigger className="data-[state=active]:bg-brand-blue-100" value="projects">Projects</TabsTrigger>
+                <TabsTrigger className="data-[state=active]:bg-brand-blue-100" value="skills">Skills</TabsTrigger>
                 <TabsTrigger className="data-[state=active]:bg-brand-blue-100" value="me">More</TabsTrigger>
             </TabsList>
             <TabsContent value="expertise">
                 <ProfileExpertiseTab />
             </TabsContent>
-            <TabsContent value="skills">
-                <ProfileSkillsTab />
-            </TabsContent>
             <TabsContent value="projects">
                 <ProfileProjectsTab />
+            </TabsContent>
+            <TabsContent value="skills">
+                <ProfileSkillsTab />
             </TabsContent>
             <TabsContent value="me">
                 <ProfileMoreTab />

@@ -1,7 +1,7 @@
 
-import Link from "next/link";
 import MotionDiv from "@/app/(internetfriends)/components/motion-div";
-import { curriculum } from "@/app/(internetfriends)/lib/curriculum/data";;
+import { curriculum } from "@/app/(internetfriends)/lib/curriculum/data";
+import Link from "next/link";
 import { cardCss } from "./profile-card";
 
 export const ProfileHeader = () => {

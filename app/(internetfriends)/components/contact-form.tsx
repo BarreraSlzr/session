@@ -169,7 +169,7 @@ export function ContactForm() {
                     className="flex items-center gap-2 text-brand-blue-200 bg-foreground border-2 border-brand-blue-800 px-8 py-3 rounded-sm hover:opacity-90 transition-opacity"
                 >
                     {`🎉 Let's make magic happen!`}
-                    <ArrowUpRight className="size-4" />
+                    <ArrowUpRight className="h-4 w-4" />
                 </Button>
             </div>
         </form>

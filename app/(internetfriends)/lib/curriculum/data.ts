@@ -100,7 +100,7 @@ export const curriculum: CVData = {
       fullname: 'Emmanuel Barrera Salazar',
       timezone: 'UTC-5',
       isOnline: true,
-      bio: "Full Stack Software Developer with expertise in building and maintaining web applications using modern technologies like Java, TypeScript, React, and NodeJS. Skilled in cloud infrastructure, data engineering, and AI systems, with a proven ability to deliver high-quality solutions collaboratively and independently.",
+      bio: "Full Stack Software Developer with experience in building and maintaining web applications using modern technologies like Java, TypeScript, React, and NodeJS. Skilled in cloud infrastructure, data engineering, and AI systems, with a proven ability to deliver high-quality solutions collaboratively and independently.",
       urls: [
         { title: 'Website', url: 'https://BarreraSlzr.InternetFriends.xyz', icon: 'web' },
         { title: 'LinkedIn', url: 'https://www.linkedin.com/in/barreraslzr/', icon: 'linkedin' },

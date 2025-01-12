@@ -2,7 +2,7 @@
 
 import MotionDiv from "@/app/(internetfriends)/components/motion-div";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { curriculum } from "@/app/(internetfriends)/lib/curriculum/data";;
+import { curriculum } from "@/app/(internetfriends)/lib/curriculum/data";
 import { TZDate } from "@date-fns/tz";
 import { format } from "date-fns";
 import { cardCss } from "./profile-card";

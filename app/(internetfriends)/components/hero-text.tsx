@@ -1,9 +1,11 @@
 'use client'
 
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren, useMemo } from 'react';
 import content from '../content.json';
-import NoiseFilterDiv from './noise-filter-div';
+import NoiseFilter from './backgrounds/noise-filter-div';
 import { motion } from 'framer-motion';
+import { BgGoo } from './backgrounds/gloo';
+import { getRandomColors } from '../lib/color-palette';
 
 const DefaultHero = () => (
     <div className='text-3xl md:text-4xl lg:text-5xl leading-relaxed'>
@@ -17,9 +19,22 @@ type Props = {
 }
 
 export default function HeroText({ children = <DefaultHero />, className }: PropsWithChildren<Props>) {
+
+    const randomColors = useMemo(() => getRandomColors(), []);
     return (
         <section className={`relative min-h-[60vh] ${className}`}>
-            <NoiseFilterDiv/>
+            <div className="absolute inset-0 w-full h-full pointer-events-none z-0">
+                <NoiseFilter className='mix-blend-hue'/>
+                <BgGoo
+                    speed={0.3}
+                    resolution={2.0}
+                    depth={2}
+                    seed={0.4}
+                    color1={randomColors[0]}
+                    color2={randomColors[1]}
+                    color3={randomColors[2]}
+                />
+            </div>
             <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}

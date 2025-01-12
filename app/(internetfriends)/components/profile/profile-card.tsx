@@ -1,11 +1,11 @@
 
 import Head from "next/head";
+import MotionDiv from "@/app/(internetfriends)/components/motion-div";
 import { ProfileHeader } from "./profile-header";
 import { ProfileInfo } from "./profile-info";
 import { ProfileTabs } from "./profile-tabs";
-import content from '@/app/(internetfriends)/content.json'
 import { curriculum } from "@/app/(internetfriends)/lib/curriculum/data";
-import MotionDiv from "@/app/(internetfriends)/components/motion-div";
+import content from '@/app/(internetfriends)/content.json'
 
 export const cardCss = `sm:p-4 p-2 bg-brand-blue-900 rounded-sm`;
 
@@ -33,7 +33,7 @@ const ProfileCard = () => {
                 <meta name="twitter:title" content={`Hire ${curriculum.contactInfo.fullname}`} />
                 <meta
                     name="twitter:description"
-                    content={`Explore ${curriculum.contactInfo.fullname}'s professional expertise and background.`}
+                    content={`Explore ${curriculum.contactInfo.fullname}'s professional experience and background.`}
                 />
                 <meta name="twitter:image" content="https://github.com/BarreraSlzr.png" />
                 <meta name="robots" content="index, follow" />
