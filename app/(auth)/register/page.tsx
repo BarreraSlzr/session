@@ -10,7 +10,7 @@ export default function Page() {
   return (
     <main className='flex flex-col h-dvh'>
       <div className="relative grow flex items-start md:items-center justify-center bg-background">
-        <div className="w-full max-w-md overflow-hidden rounded-2xl gap-12 flex flex-col bg-background mt-12 md:-mt-12 pb-12 z-10">
+        <div className="w-full max-w-md overflow-hidden rounded-lg gap-12 flex flex-col bg-background mt-12 md:-mt-12 pb-12 z-10">
           <Header />
           <div className="flex flex-col items-center justify-center gap-2 px-4 text-center sm:px-16">
             <h3 className="text-xl font-semibold dark:text-zinc-50">Regístrate</h3>
@@ -19,18 +19,6 @@ export default function Page() {
             </p>
           </div>
           <AuthForm type='register'>
-            <div className="flex flex-col gap-2">
-              <label htmlFor="verificationCode" className="text-zinc-600 font-normal dark:text-zinc-400">
-                Verification Code
-              </label>
-              <input
-                id="verificationCode"
-                name="verificationCode"
-                className="bg-muted text-md md:text-sm"
-                type="text"
-                placeholder="Enter your verification code"
-              />
-            </div>
             <p className="text-center text-sm text-gray-600 mt-4 dark:text-zinc-400">
               {'¿Ya tienes una cuenta? '}
               <Link
