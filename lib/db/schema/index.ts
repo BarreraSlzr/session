@@ -95,8 +95,8 @@ export async function initializeDatabase() {
     .addColumn('userId', 'uuid', (col) =>
       col.references('User.id').onDelete('cascade').notNull()
     )
-    .addColumn('sessionToken', 'varchar', (col) => col.notNull())
-    .addColumn('expiresAt', 'timestamptz', (col) => col.notNull())
+    .addColumn('sessionToken', 'varchar', (col) => col.notNull().defaultTo(sql`gen_random_uuid()`))
+    .addColumn('expiresAt', 'timestamptz', (col) => col.notNull().defaultTo(sql`now() + interval '1 week'`))
     .execute();
 
   await db.schema
@@ -105,7 +105,7 @@ export async function initializeDatabase() {
     .addColumn('userId', 'uuid', (col) =>
       col.references('User.id').onDelete('cascade').notNull()
     )
-    .addColumn('secret', 'varchar', (col) => col.notNull())
+    .addColumn('secret', 'varchar', (col) => col.notNull().defaultTo(sql`gen_random_uuid()`))
     .execute();
 
   await db.schema
@@ -115,6 +115,15 @@ export async function initializeDatabase() {
       col.references('User.id').onDelete('cascade').notNull()
     )
     .addColumn('credential', 'json', (col) => col.notNull())
+    .execute();
+
+  await db.schema
+    .createTable('WebAuthnChallenge')
+    .ifNotExists()
+    .addColumn('userId', 'uuid', (col) =>
+      col.references('User.id').onDelete('cascade').notNull()
+    )
+    .addColumn('challenge', 'varchar', (col) => col.notNull().defaultTo(sql`gen_random_uuid()`))
     .execute();
     
   console.log('Database schema initialized.');
