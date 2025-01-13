@@ -2,6 +2,10 @@ import { hash, genSalt } from 'bcrypt-ts';
 import { db } from '.';
 import { DocumentKind, MessageTable, Visibility } from './types';
 import { Insertable } from 'kysely';
+import { randomBytes } from 'crypto';
+import { promisify } from 'util';
+
+const randomBytesAsync = promisify(randomBytes);
 
 export async function getUser(email: string) {
   return await db.selectFrom('User').selectAll().where('email', '=', email).execute();
@@ -198,4 +202,12 @@ export async function renewSession(sessionToken: string): Promise<string | null>
 
 export async function deleteSession(sessionToken: string): Promise<void> {
   await db.deleteFrom('Session').where('sessionToken', '=', sessionToken).execute();
+}
+
+export async function setupWebAuthn(userId: string, credential: any) {
+  return await db.insertInto('WebAuthn').values({ userId, credential }).returningAll().executeTakeFirstOrThrow();
+}
+
+export async function getWebAuthnCredential(userId: string) {
+  return await db.selectFrom('WebAuthn').selectAll().where('userId', '=', userId).executeTakeFirst();
 }

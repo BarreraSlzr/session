@@ -98,6 +98,24 @@ export async function initializeDatabase() {
     .addColumn('sessionToken', 'varchar', (col) => col.notNull())
     .addColumn('expiresAt', 'timestamptz', (col) => col.notNull())
     .execute();
+
+  await db.schema
+    .createTable('Mfa')
+    .ifNotExists()
+    .addColumn('userId', 'uuid', (col) =>
+      col.references('User.id').onDelete('cascade').notNull()
+    )
+    .addColumn('secret', 'varchar', (col) => col.notNull())
+    .execute();
+
+  await db.schema
+    .createTable('WebAuthn')
+    .ifNotExists()
+    .addColumn('userId', 'uuid', (col) =>
+      col.references('User.id').onDelete('cascade').notNull()
+    )
+    .addColumn('credential', 'json', (col) => col.notNull())
+    .execute();
     
   console.log('Database schema initialized.');
   return db;

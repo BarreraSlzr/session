@@ -20,18 +20,6 @@ export default function Page() {
           </div>
           <AuthForm type='register'>
             <div className="flex flex-col gap-2">
-              <label htmlFor="mfaToken" className="text-zinc-600 font-normal dark:text-zinc-400">
-                MFA Token
-              </label>
-              <input
-                id="mfaToken"
-                name="mfaToken"
-                className="bg-muted text-md md:text-sm"
-                type="text"
-                placeholder="Enter your MFA token"
-              />
-            </div>
-            <div className="flex flex-col gap-2">
               <label htmlFor="verificationCode" className="text-zinc-600 font-normal dark:text-zinc-400">
                 Verification Code
               </label>

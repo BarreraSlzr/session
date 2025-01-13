@@ -74,6 +74,40 @@ export function AuthForm({ type, children, defaultEmail = '' }: AuthFormProps) {
     }
   }
 
+  const handleWebAuthnLogin = async () => {
+    try {
+      const publicKeyCredentialRequestOptions = await fetch('/api/auth/webauthn/request', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      }).then((res) => res.json())
+
+      const assertion = await navigator.credentials.get({
+        publicKey: publicKeyCredentialRequestOptions,
+      })
+
+      const response = await fetch('/api/auth/webauthn/verify', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ assertion }),
+      })
+
+      if (response.ok) {
+        toast.success('WebAuthn login successful')
+        setIsSuccessful(true)
+        router.refresh()
+      } else {
+        toast.error('WebAuthn login failed')
+      }
+    } catch (error) {
+      toast.error('WebAuthn login error')
+    }
+  }
+
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4 px-4 sm:px-16">
       <div className="flex flex-col gap-2">
@@ -128,9 +162,7 @@ export function AuthForm({ type, children, defaultEmail = '' }: AuthFormProps) {
           <button
             type="button"
             className="mt-4 bg-blue-500 text-white py-2 px-4 rounded"
-            onClick={() => {
-              // Handle WebAuthn login
-            }}
+            onClick={handleWebAuthnLogin}
           >
             Login with WebAuthn
           </button>
