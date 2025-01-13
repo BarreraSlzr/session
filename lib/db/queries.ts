@@ -139,8 +139,8 @@ export async function updateChatVisibilityById(chatId: string, visibility: Visib
   return await db.updateTable('Chat').set({ visibility }).where('id', '=', chatId).returningAll().executeTakeFirstOrThrow();
 }
 
-export async function setupMfa(userId: string, secret: string) {
-  return await db.insertInto('Mfa').values({ userId, secret }).returningAll().executeTakeFirstOrThrow();
+export async function setupMfa(userId: string) {
+  return await db.insertInto('Mfa').values({ userId }).returningAll().executeTakeFirstOrThrow();
 }
 
 export async function verifyMfa(userId: string, token: string) {
@@ -161,16 +161,10 @@ export async function updateUserPassword(userId: string, newPassword: string) {
   return await db.updateTable('User').set({ password: hashedPassword }).where('id', '=', userId).returningAll().executeTakeFirstOrThrow();
 }
 
-export async function createSession(userId: string): Promise<string> {
-  const sessionToken = (await db.selectFrom('Session').select('sessionToken').executeTakeFirst()).sessionToken;
-
-  await db.insertInto('Session').values({
+export async function createSession(userId: string) {
+  return await db.insertInto('Session').values({
     userId,
-    sessionToken,
-    expiresAt: new Date(Date.now() + 60 * 60 * 24 * 7 * 1000), // 1 week expiration
   }).execute();
-
-  return sessionToken;
 }
 
 export async function validateSession(sessionToken: string): Promise<boolean> {
@@ -181,15 +175,11 @@ export async function validateSession(sessionToken: string): Promise<boolean> {
   return false;
 }
 
-export async function renewSession(sessionToken: string): Promise<string | null> {
+export async function renewSession(sessionToken: string) {
   const session = await db.selectFrom('Session').selectAll().where('sessionToken', '=', sessionToken).executeTakeFirst();
   if (session) {
-    const newSessionToken = (await db.selectFrom('Session').select('sessionToken').executeTakeFirst()).sessionToken;
-    await db.updateTable('Session').set({
-      sessionToken: newSessionToken,
-      expiresAt: new Date(Date.now() + 60 * 60 * 24 * 7 * 1000), // 1 week expiration
-    }).where('id', '=', session.id).execute();
-    return newSessionToken;
+    await deleteSession(sessionToken);
+    return await createSession(session.userId);
   }
   return null;
 }
