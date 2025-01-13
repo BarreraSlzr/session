@@ -2,7 +2,7 @@
 
 import { z } from 'zod';
 
-import { createUser, getUser, getUserByToken, updateUserPassword } from '@/lib/db/queries';
+import { createUser, getUser, getUserByToken, updateUserPassword, createSession, validateSession, renewSession, deleteSession } from '@/lib/db/queries';
 import { sendVerificationEmail } from '@/lib/email/sendVerificationEmail';
 import { sendResetEmail } from '@/lib/email/sendResetEmail';
 import { generateToken, verifyToken } from '@/lib/auth/generateToken';
@@ -39,6 +39,9 @@ export const login = async (
       password: validatedData.password,
       redirect: false,
     });
+
+    const sessionToken = await createSession(user.id);
+    setSessionCookie(res, sessionToken);
 
     return { status: 'success' };
   } catch (error) {
@@ -85,6 +88,9 @@ export const register = async (
       password: validatedData.password,
       redirect: false,
     });
+
+    const sessionToken = await createSession(newUser.id);
+    setSessionCookie(res, sessionToken);
 
     return { status: 'success' };
   } catch (error) {
