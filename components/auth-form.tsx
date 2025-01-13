@@ -110,6 +110,49 @@ export function AuthForm({ type, children, defaultEmail = '' }: AuthFormProps) {
           required
         />
       </div>
+      {type === 'login' && (
+        <div className="flex flex-col gap-2">
+          <Label
+            htmlFor="mfaToken"
+            className="text-zinc-600 font-normal dark:text-zinc-400"
+          >
+            MFA Token
+          </Label>
+          <Input
+            id="mfaToken"
+            name="mfaToken"
+            className="bg-muted text-md md:text-sm"
+            type="text"
+            placeholder="Enter your MFA token"
+          />
+          <button
+            type="button"
+            className="mt-4 bg-blue-500 text-white py-2 px-4 rounded"
+            onClick={() => {
+              // Handle WebAuthn login
+            }}
+          >
+            Login with WebAuthn
+          </button>
+        </div>
+      )}
+      {type === 'register' && (
+        <div className="flex flex-col gap-2">
+          <Label
+            htmlFor="verificationCode"
+            className="text-zinc-600 font-normal dark:text-zinc-400"
+          >
+            Verification Code
+          </Label>
+          <Input
+            id="verificationCode"
+            name="verificationCode"
+            className="bg-muted text-md md:text-sm"
+            type="text"
+            placeholder="Enter your verification code"
+          />
+        </div>
+      )}
       <SubmitButton
         id={type}
         isSuccessful={isSuccessful}
@@ -120,4 +163,3 @@ export function AuthForm({ type, children, defaultEmail = '' }: AuthFormProps) {
     </form>
   )
 }
-

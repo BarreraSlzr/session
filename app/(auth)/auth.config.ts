@@ -1,39 +1,76 @@
-import type { NextAuthConfig } from 'next-auth';
+import { compare } from 'bcrypt-ts';
+import NextAuth, { type User, type Session } from 'next-auth';
+import Credentials from 'next-auth/providers/credentials';
 
-export const authConfig = {
-  pages: {
-    signIn: '/login',
-    newUser: '/',
-  },
+import { getUser } from '@/lib/db/queries';
+
+import { authConfig } from './auth.config';
+import { verifyMfaToken } from '@/lib/auth/mfa';
+import { verifyWebAuthnAssertion } from '@/lib/auth/webauthn';
+import { createSession, validateSession, renewSession, deleteSession } from '@/lib/auth/session';
+
+interface ExtendedSession extends Session {
+  user: User;
+}
+
+export const {
+  handlers: { GET, POST },
+  auth,
+  signIn,
+  signOut,
+} = NextAuth({
+  ...authConfig,
   providers: [
-    // added later in auth.ts since it requires bcrypt which is only compatible with Node.js
-    // while this file is also used in non-Node.js environments
+    Credentials({
+      credentials: {},
+      async authorize({ email, password, mfaToken, webAuthnResponse }: any) {
+        const users = await getUser(email);
+        if (users.length === 0) return null;
+        // biome-ignore lint: Forbidden non-null assertion.
+        const passwordsMatch = await compare(password, users[0].password!);
+        if (!passwordsMatch) return null;
+
+        if (users[0].mfaEnabled && !mfaToken) {
+          throw new Error('MFA_REQUIRED');
+        }
+
+        if (users[0].mfaEnabled && mfaToken) {
+          const isMfaValid = await verifyMfaToken(users[0].id, mfaToken);
+          if (!isMfaValid) return null;
+        }
+
+        if (webAuthnResponse) {
+          const isWebAuthnValid = await verifyWebAuthnAssertion(users[0].id, webAuthnResponse);
+          if (!isWebAuthnValid) return null;
+        }
+
+        const sessionToken = await createSession(users[0].id);
+        return { ...users[0], sessionToken } as any;
+      },
+    }),
   ],
   callbacks: {
-    authorized({ auth, request: { nextUrl } }) {
-      const isLoggedIn = !!auth?.user;
-      const isOnChat = nextUrl.pathname.startsWith('/');
-      const isOnRegister = nextUrl.pathname.startsWith('/register');
-      const isOnLogin = nextUrl.pathname.startsWith('/login');
-
-      if (isLoggedIn && (isOnLogin || isOnRegister)) {
-        return Response.redirect(new URL('/', nextUrl as unknown as URL));
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.sessionToken = user.sessionToken;
       }
 
-      if (isOnRegister || isOnLogin) {
-        return true; // Always allow access to register and login pages
+      return token;
+    },
+    async session({
+      session,
+      token,
+    }: {
+      session: ExtendedSession;
+      token: any;
+    }) {
+      if (session.user) {
+        session.user.id = token.id as string;
+        session.user.sessionToken = token.sessionToken as string;
       }
 
-      if (isOnChat) {
-        if (isLoggedIn) return true;
-        return false; // Redirect unauthenticated users to login page
-      }
-
-      if (isLoggedIn) {
-        return Response.redirect(new URL('/', nextUrl as unknown as URL));
-      }
-
-      return true;
+      return session;
     },
   },
-} satisfies NextAuthConfig;
+});

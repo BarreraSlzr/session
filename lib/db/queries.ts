@@ -138,3 +138,64 @@ export async function deleteMessagesByChatIdAfterTimestamp(chatId: string, times
 export async function updateChatVisibilityById(chatId: string, visibility: Visibility) {
   return await db.updateTable('Chat').set({ visibility }).where('id', '=', chatId).returningAll().executeTakeFirstOrThrow();
 }
+
+export async function setupMfa(userId: string, secret: string) {
+  return await db.insertInto('Mfa').values({ userId, secret }).returningAll().executeTakeFirstOrThrow();
+}
+
+export async function verifyMfa(userId: string, token: string) {
+  return await db.selectFrom('Mfa').selectAll().where('userId', '=', userId).where('token', '=', token).executeTakeFirst();
+}
+
+export async function getUserByToken(token: string) {
+  return await db.selectFrom('User').selectAll().where('token', '=', token).executeTakeFirst();
+}
+
+export async function updateUserVerificationStatus(userId: string, isVerified: boolean) {
+  return await db.updateTable('User').set({ isVerified }).where('id', '=', userId).returningAll().executeTakeFirstOrThrow();
+}
+
+export async function updateUserPassword(userId: string, newPassword: string) {
+  const salt = await genSalt(10);
+  const hashedPassword = await hash(newPassword, salt);
+  return await db.updateTable('User').set({ password: hashedPassword }).where('id', '=', userId).returningAll().executeTakeFirstOrThrow();
+}
+
+export async function createSession(userId: string): Promise<string> {
+  const sessionId = (await randomBytesAsync(16)).toString('hex');
+  const sessionToken = (await randomBytesAsync(32)).toString('hex');
+
+  await db.insertInto('Session').values({
+    id: sessionId,
+    userId,
+    sessionToken,
+    expiresAt: new Date(Date.now() + 60 * 60 * 24 * 7 * 1000), // 1 week expiration
+  }).execute();
+
+  return sessionToken;
+}
+
+export async function validateSession(sessionToken: string): Promise<boolean> {
+  const session = await db.selectFrom('Session').selectAll().where('sessionToken', '=', sessionToken).executeTakeFirst();
+  if (session && new Date(session.expiresAt) > new Date()) {
+    return true;
+  }
+  return false;
+}
+
+export async function renewSession(sessionToken: string): Promise<string | null> {
+  const session = await db.selectFrom('Session').selectAll().where('sessionToken', '=', sessionToken).executeTakeFirst();
+  if (session) {
+    const newSessionToken = (await randomBytesAsync(32)).toString('hex');
+    await db.updateTable('Session').set({
+      sessionToken: newSessionToken,
+      expiresAt: new Date(Date.now() + 60 * 60 * 24 * 7 * 1000), // 1 week expiration
+    }).where('id', '=', session.id).execute();
+    return newSessionToken;
+  }
+  return null;
+}
+
+export async function deleteSession(sessionToken: string): Promise<void> {
+  await db.deleteFrom('Session').where('sessionToken', '=', sessionToken).execute();
+}
