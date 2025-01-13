@@ -146,19 +146,6 @@ export function AuthForm({ type, children, defaultEmail = '' }: AuthFormProps) {
       </div>
       {type === 'login' && (
         <div className="flex flex-col gap-2">
-          <Label
-            htmlFor="mfaToken"
-            className="text-zinc-600 font-normal dark:text-zinc-400"
-          >
-            MFA Token
-          </Label>
-          <Input
-            id="mfaToken"
-            name="mfaToken"
-            className="bg-muted text-md md:text-sm"
-            type="text"
-            placeholder="Enter your MFA token"
-          />
           <button
             type="button"
             className="mt-4 bg-blue-500 text-white py-2 px-4 rounded"

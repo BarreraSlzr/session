@@ -8,7 +8,7 @@ import { getRandomColors } from '@/app/(internetfriends)/lib/color-palette';
 export default function Page() {
   const randomColors = getRandomColors();
   return (
-    <main className='flex flex-col h-dvh'>
+    <main className='flex flex-col h-full'>
       <div className="relative grow flex items-start md:items-center justify-center bg-background">
         <div className="w-full max-w-md overflow-hidden rounded-lg gap-12 flex flex-col bg-background mt-12 md:-mt-12 pb-12 z-10">
           <Header />

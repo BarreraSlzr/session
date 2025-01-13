@@ -9,7 +9,7 @@ export default function Page() {
   const randomColors = getRandomColors();
   
   return (
-    <main className='flex flex-col h-dvh'>
+    <main className='flex flex-col h-full'>
       <div className="relative grow flex items-start md:items-center justify-center">
         <div className="w-full max-w-md overflow-hidden rounded-lg flex flex-col gap-12 bg-background mt-12 md:-mt-12 pb-12 z-10">
           <Header />
@@ -20,27 +20,6 @@ export default function Page() {
             </p>
           </div>
           <AuthForm type='login'>
-            <div className="flex flex-col gap-2">
-              <label htmlFor="mfaToken" className="text-zinc-600 font-normal dark:text-zinc-400">
-                MFA Token
-              </label>
-              <input
-                id="mfaToken"
-                name="mfaToken"
-                className="bg-muted text-md md:text-sm"
-                type="text"
-                placeholder="Enter your MFA token"
-              />
-            </div>
-            <button
-              type="button"
-              className="mt-4 bg-blue-500 text-white py-2 px-4 rounded"
-              onClick={() => {
-                // Handle WebAuthn login
-              }}
-            >
-              Login with WebAuthn
-            </button>
             <p className="text-center text-sm text-gray-600 mt-4 dark:text-zinc-400">
               {"¿No tienes una cuenta? "}
               <Link

@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { verifyToken } from '@/lib/auth/verifyToken';
-import { getUser, updateUserVerificationStatus } from '@/lib/db/queries';
+import { getUserByToken, updateUserVerificationStatus } from '@/lib/db/queries';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { token } = req.query;

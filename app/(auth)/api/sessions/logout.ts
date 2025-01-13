@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { deleteSession } from '@/lib/auth/session';
+import { deleteSession } from '@/lib/db/queries';
 import { clearSessionCookie } from '@/lib/cookies/clearSessionCookie';
 
 export default async function logout(req: NextApiRequest, res: NextApiResponse) {

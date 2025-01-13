@@ -3,7 +3,7 @@ import { validatePassword } from '@/lib/auth/validatePassword';
 import { generateToken } from '@/lib/auth/generateToken';
 import { verifyToken } from '@/lib/auth/verifyToken';
 import { sendResetEmail } from '@/lib/email/sendResetEmail';
-import { getUser, updateUserPassword } from '@/lib/db/queries';
+import { getUser, getUserByToken, updateUserPassword } from '@/lib/db/queries';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
@@ -38,14 +38,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ error: 'Invalid or expired token' });
     }
 
-    const [user] = await getUserByToken(token);
+    const user = await getUserByToken(token);
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    const hashedPassword = await validatePassword(newPassword);
-    await updateUserPassword(user.id, hashedPassword);
+    await updateUserPassword(user.id, newPassword);
 
     return res.status(200).json({ message: 'Password reset successful' });
   }

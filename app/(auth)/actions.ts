@@ -3,7 +3,6 @@
 import { z } from 'zod';
 
 import { createUser, getUser, getUserByToken, updateUserPassword } from '@/lib/db/queries';
-import { generateMfaSecret, verifyMfaToken } from '@/lib/auth/mfa';
 import { sendVerificationEmail } from '@/lib/email/sendVerificationEmail';
 import { sendResetEmail } from '@/lib/email/sendResetEmail';
 import { generateToken, verifyToken } from '@/lib/auth/generateToken';
@@ -13,11 +12,10 @@ import { signIn } from './auth';
 const authFormSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
-  mfaToken: z.string().optional(),
 });
 
 export interface LoginActionState {
-  status: 'idle' | 'in_progress' | 'success' | 'failed' | 'invalid_data' | 'mfa_required';
+  status: 'idle' | 'in_progress' | 'success' | 'failed' | 'invalid_data';
 }
 
 export const login = async (
@@ -28,24 +26,12 @@ export const login = async (
     const validatedData = authFormSchema.parse({
       email: formData.get('email'),
       password: formData.get('password'),
-      mfaToken: formData.get('mfaToken') as string | undefined,
     });
 
     const [user] = await getUser(validatedData.email);
 
     if (!user) {
       return { status: 'failed' };
-    }
-
-    if (user.mfaEnabled && !validatedData.mfaToken) {
-      return { status: 'mfa_required' };
-    }
-
-    if (user.mfaEnabled && validatedData.mfaToken) {
-      const isMfaValid = await verifyMfaToken(user.id, validatedData.mfaToken);
-      if (!isMfaValid) {
-        return { status: 'failed' };
-      }
     }
 
     await signIn('credentials', {
@@ -92,8 +78,7 @@ export const register = async (
 
     const newUser = await createUser(validatedData.email, validatedData.password);
 
-    const mfaSecret = await generateMfaSecret(newUser.id);
-    await sendVerificationEmail(validatedData.email, mfaSecret);
+    await sendVerificationEmail(validatedData.email, newUser.id);
 
     await signIn('credentials', {
       email: validatedData.email,
