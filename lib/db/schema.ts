@@ -87,6 +87,44 @@ export async function initializeDatabase() {
       'createdAt',
     ])
     .execute();
+
+  await db.schema
+    .createTable('Session')
+    .ifNotExists()
+    .addColumn('id', 'uuid', (col) => col.primaryKey().defaultTo(sql`gen_random_uuid()`).notNull())
+    .addColumn('userId', 'uuid', (col) =>
+      col.references('User.id').onDelete('cascade').notNull()
+    )
+    .addColumn('sessionToken', 'varchar', (col) => col.notNull())
+    .addColumn('expiresAt', 'timestamptz', (col) => col.notNull())
+    .execute();
+
+  await db.schema
+    .createTable('Mfa')
+    .ifNotExists()
+    .addColumn('userId', 'uuid', (col) =>
+      col.references('User.id').onDelete('cascade').notNull()
+    )
+    .addColumn('secret', 'varchar', (col) => col.notNull())
+    .execute();
+
+  await db.schema
+    .createTable('WebAuthn')
+    .ifNotExists()
+    .addColumn('userId', 'uuid', (col) =>
+      col.references('User.id').onDelete('cascade').notNull()
+    )
+    .addColumn('credential', 'json', (col) => col.notNull())
+    .execute();
+
+  await db.schema
+    .createTable('WebAuthnChallenge')
+    .ifNotExists()
+    .addColumn('userId', 'uuid', (col) =>
+      col.references('User.id').onDelete('cascade').notNull()
+    )
+    .addColumn('challenge', 'varchar', (col) => col.notNull())
+    .execute();
     
   console.log('Database schema initialized.');
   return db;

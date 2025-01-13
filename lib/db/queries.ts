@@ -2,10 +2,7 @@ import { hash, genSalt } from 'bcrypt-ts';
 import { db } from '.';
 import { DocumentKind, MessageTable, Visibility } from './types';
 import { Insertable } from 'kysely';
-import { randomBytes } from 'crypto';
-import { promisify } from 'util';
-
-const randomBytesAsync = promisify(randomBytes);
+import { generateRandomBytes } from '../randomBytes';
 
 export async function getUser(email: string) {
   return await db.selectFrom('User').selectAll().where('email', '=', email).execute();
@@ -166,8 +163,8 @@ export async function updateUserPassword(userId: string, newPassword: string) {
 }
 
 export async function createSession(userId: string): Promise<string> {
-  const sessionId = (await randomBytesAsync(16)).toString('hex');
-  const sessionToken = (await randomBytesAsync(32)).toString('hex');
+  const sessionId = (await generateRandomBytes(16)).toString('hex');
+  const sessionToken = (await generateRandomBytes(32)).toString('hex');
 
   await db.insertInto('Session').values({
     id: sessionId,
@@ -190,7 +187,7 @@ export async function validateSession(sessionToken: string): Promise<boolean> {
 export async function renewSession(sessionToken: string): Promise<string | null> {
   const session = await db.selectFrom('Session').selectAll().where('sessionToken', '=', sessionToken).executeTakeFirst();
   if (session) {
-    const newSessionToken = (await randomBytesAsync(32)).toString('hex');
+    const newSessionToken = (await generateRandomBytes(32)).toString('hex');
     await db.updateTable('Session').set({
       sessionToken: newSessionToken,
       expiresAt: new Date(Date.now() + 60 * 60 * 24 * 7 * 1000), // 1 week expiration

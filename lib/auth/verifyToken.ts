@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import { generateRandomBytes } from '../randomBytes';
 
 const secretKey = process.env.JWT_SECRET_KEY || 'default_secret_key';
 

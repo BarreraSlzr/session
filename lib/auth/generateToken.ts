@@ -1,5 +1,5 @@
-import { randomBytes } from 'crypto';
+import { generateRandomBytes } from '../randomBytes';
 
 export function generateToken(length: number): string {
-  return randomBytes(length).toString('hex');
+  return generateRandomBytes(length).toString('hex');
 }
