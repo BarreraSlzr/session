@@ -5,7 +5,9 @@ import { z } from 'zod';
 import { createUser, getUser, getUserByToken, updateUserPassword, createSession, validateSession, renewSession, deleteSession } from '@/lib/db/queries';
 import { sendVerificationEmail } from '@/lib/email/sendVerificationEmail';
 import { sendResetEmail } from '@/lib/email/sendResetEmail';
-import { generateToken, verifyToken } from '@/lib/auth/generateToken';
+import { generateToken } from '@/lib/auth/generateToken';
+import { verifyToken } from '@/lib/auth/verifyToken';
+import { setSessionCookie } from '@/lib/cookies/setSessionCookie';
 
 import { signIn } from './auth';
 

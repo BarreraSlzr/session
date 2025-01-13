@@ -4,20 +4,13 @@ import Credentials from 'next-auth/providers/credentials';
 
 import { getUser } from '@/lib/db/queries';
 
-import { authConfig } from './auth.config';
 import { createSession, validateSession, renewSession, deleteSession } from '@/lib/auth/session';
 
 interface ExtendedSession extends Session {
   user: User;
 }
 
-export const {
-  handlers: { GET, POST },
-  auth,
-  signIn,
-  signOut,
-} = NextAuth({
-  ...authConfig,
+export const authConfig = {
   providers: [
     Credentials({
       credentials: {},
@@ -57,4 +50,16 @@ export const {
       return session;
     },
   },
-});
+  cookies: {
+    sessionToken: {
+      name: 'session',
+      options: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        domain: '.InternetFriends.xyz',
+        path: '/',
+      },
+    },
+  },
+};

@@ -6,7 +6,7 @@ import { handleRedirect } from '@/lib/redirect';
 export default NextAuth(authConfig).auth;
 
 export const config = {
-  matcher: ['/', '/:id', '/api/:path*', '/login', '/register'],
+  matcher: ['/', '/600x600.jpg', '/api/:path*', '/login', '/register'],
 };
 
 export function middleware(req: NextRequest) {
