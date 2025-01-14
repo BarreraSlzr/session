@@ -7,9 +7,9 @@ import { sendVerificationEmail } from '@/lib/email/sendVerificationEmail';
 import { sendResetEmail } from '@/lib/email/sendResetEmail';
 import { generateToken } from '@/lib/auth/generateToken';
 import { verifyToken } from '@/lib/auth/verifyToken';
-import { setSessionCookie } from '@/lib/cookies/setSessionCookie';
 
 import { signIn } from './auth';
+import { setSessionCookie } from '@/lib/auth/session';
 
 const authFormSchema = z.object({
   email: z.string().email(),

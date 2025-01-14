@@ -139,59 +139,30 @@ export async function updateChatVisibilityById(chatId: string, visibility: Visib
   return await db.updateTable('Chat').set({ visibility }).where('id', '=', chatId).returningAll().executeTakeFirstOrThrow();
 }
 
-export async function setupMfa(userId: string) {
-  return await db.insertInto('Mfa').values({ userId }).returningAll().executeTakeFirstOrThrow();
-}
-
-export async function verifyMfa(userId: string, token: string) {
-  return await db.selectFrom('Mfa').selectAll().where('userId', '=', userId).where('token', '=', token).executeTakeFirst();
-}
-
-export async function getUserByToken(token: string) {
-  return await db.selectFrom('User').selectAll().where('token', '=', token).executeTakeFirst();
-}
-
-export async function updateUserVerificationStatus(userId: string, isVerified: boolean) {
-  return await db.updateTable('User').set({ isVerified }).where('id', '=', userId).returningAll().executeTakeFirstOrThrow();
-}
-
-export async function updateUserPassword(userId: string, newPassword: string) {
-  const salt = await genSalt(10);
-  const hashedPassword = await hash(newPassword, salt);
-  return await db.updateTable('User').set({ password: hashedPassword }).where('id', '=', userId).returningAll().executeTakeFirstOrThrow();
-}
-
-export async function createSession(userId: string) {
-  return await db.insertInto('Session').values({
-    userId,
-  }).execute();
-}
-
-export async function validateSession(sessionToken: string): Promise<boolean> {
-  const session = await db.selectFrom('Session').selectAll().where('sessionToken', '=', sessionToken).executeTakeFirst();
-  if (session && new Date(session.expiresAt) > new Date()) {
-    return true;
+export async function upsertContactSubmission(data: ContactFormData, id?: string) {
+  if (id) {
+    return await db
+      .updateTable('contact_submissions')
+      .set({
+        ...data,
+        updated_at: new Date().toISOString(),
+      })
+      .where('id', '=', id)
+      .returning(['id'])
+      .executeTakeFirst()
   }
-  return false;
+
+  return await db
+    .insertInto('contact_submissions')
+    .values(data)
+    .returning(['id'])
+    .executeTakeFirst()
 }
 
-export async function renewSession(sessionToken: string) {
-  const session = await db.selectFrom('Session').selectAll().where('sessionToken', '=', sessionToken).executeTakeFirst();
-  if (session) {
-    await deleteSession(sessionToken);
-    return await createSession(session.userId);
-  }
-  return null;
-}
-
-export async function deleteSession(sessionToken: string): Promise<void> {
-  await db.deleteFrom('Session').where('sessionToken', '=', sessionToken).execute();
-}
-
-export async function setupWebAuthn(userId: string, credential: any) {
-  return await db.insertInto('WebAuthn').values({ userId, credential }).returningAll().executeTakeFirstOrThrow();
-}
-
-export async function getWebAuthnCredential(userId: string) {
-  return await db.selectFrom('WebAuthn').selectAll().where('userId', '=', userId).executeTakeFirst();
+export async function getContactSubmission(id: string) {
+  return await db
+    .selectFrom('contact_submissions')
+    .selectAll()
+    .where('id', '=', id)
+    .executeTakeFirst()
 }

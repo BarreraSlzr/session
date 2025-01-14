@@ -3,14 +3,7 @@ import { ColumnType, Generated, Selectable } from "kysely";
 
 interface BaseTable {
     id: Generated<string>
-    // You can specify a different type for each operation (select, insert and
-    // update) using the `ColumnType<SelectType, InsertType, UpdateType>`
-    // wrapper. Here we define a column `createdAt` that is selected as
-    // a `Date`, can optionally be provided as a `string` in inserts and
-    // can never be updated:
     createdAt: ColumnType<Date, string | undefined, never>
-    //deleted: ColumnType<Date, string | undefined, never>
-    //updated: ColumnType<Date, string | undefined, never>
 }
 
 export interface UserTable extends BaseTable {
@@ -61,6 +54,27 @@ export interface SuggestionTable extends BaseTable {
 }
 export type Suggestion = Selectable<SuggestionTable>;
 
+export interface SessionTable extends BaseTable {
+    userId: string; // UUID
+    sessionToken: Generated<string>;
+    expiresAt: Generated<Date>;
+}
+export type Session = Selectable<SessionTable>;
+
+export interface MFATable extends BaseTable {
+    userId: string; // UUID
+    secret: Generated<string>;
+    verified: boolean;
+}
+export type MFA = Selectable<MFATable>;
+
+export interface WebAuthnChallengeTable extends BaseTable {
+    userId: string; // UUID
+    challenge: Generated<string>;
+    expiresAt: Generated<Date>;
+}
+export type WebAuthnChallenge = Selectable<WebAuthnChallengeTable>;
+
 export interface Database {
     User: UserTable;
     Chat: ChatTable;
@@ -68,4 +82,7 @@ export interface Database {
     Vote: VoteTable;
     Document: DocumentTable;
     Suggestion: SuggestionTable;
+    Session: SessionTable;
+    MFA: MFATable;
+    WebAuthnChallenge: WebAuthnChallengeTable;
 }

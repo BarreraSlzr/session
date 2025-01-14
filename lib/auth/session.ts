@@ -4,16 +4,7 @@ import { serialize } from 'cookie';
 import { generateRandomBytes } from '../randomBytes';
 
 export async function createSession(userId: string): Promise<string> {
-  const sessionId = (await generateRandomBytes(16)).toString('hex');
-  const sessionToken = (await generateRandomBytes(32)).toString('hex');
-
-  await db.insertInto('Session').values({
-    id: sessionId,
-    userId,
-    sessionToken,
-    expiresAt: new Date(Date.now() + 60 * 60 * 24 * 7 * 1000), // 1 week expiration
-  }).execute();
-
+  return (await createSession(userId));
   return sessionToken;
 }
 

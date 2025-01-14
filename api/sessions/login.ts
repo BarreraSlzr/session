@@ -1,8 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { validatePassword } from '@/lib/auth/validatePassword';
 import { getUser } from '@/lib/db/queries';
-import { createSession } from '@/lib/auth/session';
-import { setSessionCookie } from '@/lib/cookies/setSessionCookie';
+import { createSession, setSessionCookie } from '@/lib/auth/session';
 
 export default async function login(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
