@@ -1,16 +1,6 @@
 import { db, sql } from ".";
-import { hash, genSalt, compare } from "bcrypt-ts";
-import { TType } from "./types";
-
-// Utility functions for common tasks
-const generateHashedPassword = async (password: string): Promise<string> => {
-  const salt = await genSalt(10);
-  return hash(password, salt);
-};
-
-const isPasswordValid = async (rawPassword: string, hashedPassword: string): Promise<boolean> => {
-  return compare(rawPassword, hashedPassword);
-};
+import { generateHashedPassword, isPasswordValid } from "../lib/password";
+import { AuthMethod, TType } from "./types";
 
 const getAuthMethodByType = async (userId: string, type: TType) => {
   return db
@@ -21,7 +11,7 @@ const getAuthMethodByType = async (userId: string, type: TType) => {
     .executeTakeFirst();
 };
 
-const getAuthMethodByCredential = async (type: TType, credential: string) => {
+const getAuthMethodByCredential = async (type: TType, credential: string): Promise<AuthMethod | undefined> => {
   return db
     .selectFrom('AuthMethod')
     .selectAll()
@@ -108,14 +98,14 @@ export async function updatePassword(userId: string, currentPassword: string, ne
   return updateAuthMethod(userId, 'password', hashedPassword);
 }
 
-export async function resetPassword(userId: string, token: string, newPassword: string) {
-  const isValid = await verifyCredential('email', userId, token);
-  if (!isValid) {
+export async function resetPassword(token: string, newPassword: string) {
+  const authMethod = await getAuthMethodByCredential('reset-password', token);
+  if (!authMethod) {
     throw new Error("Invalid or expired token.");
   }
 
   const hashedPassword = await generateHashedPassword(newPassword);
-  return updateAuthMethod(userId, 'password', hashedPassword);
+  return updateAuthMethod(authMethod.userId, 'password', hashedPassword);
 }
 
 export async function verifyPassword(userId: string, rawPassword: string): Promise<boolean> {
@@ -149,17 +139,17 @@ export async function validateSession(sessionToken: string): Promise<boolean> {
 }
 
 // Credential Verification
-export async function verifyCredential(type: TType, userId: string, credential: string): Promise<boolean> {
+export async function verifyCredential(type: TType, credential: string) {
   const authMethod = await getAuthMethodByCredential(type, credential);
 
-  if (authMethod && authMethod.userId === userId) {
+  if (authMethod) {
     await db
       .updateTable('AuthMethod')
       .set({ verifiedAt: sql`now()` })
       .where('id', '=', authMethod.id)
       .execute();
-    return true;
+    return authMethod;
   }
 
-  return false;
+  return undefined;
 }

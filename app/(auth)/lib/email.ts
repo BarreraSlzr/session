@@ -1,5 +1,5 @@
 import nodemailer from 'nodemailer';
-import { getAuthMethod } from '../db/queries';  // Assuming the token is stored as a credential in the AuthMethod table
+import { createAuthMethod } from '../db/queries';  // Assuming the token is stored as a credential in the AuthMethod table
 
 const transporter = nodemailer.createTransport({
   service: 'Gmail',
@@ -29,14 +29,14 @@ async function sendEmail({ email, subject, url }: { email: string; subject: stri
 
 // Send verification email to the user
 export async function sendVerificationEmail(email: string, userId: string) {
-  const token = await getAuthMethod(userId, 'email'); // Fetch the token (credential) from AuthMethod table
+  const token = await createAuthMethod(userId, 'email'); // Fetch the token (credential) from AuthMethod table
   const verificationUrl = `https://account.internetfriends.xyz/verify-email?token=${token}`;
   await sendEmail({ email, subject: 'Verify your email address', url: verificationUrl });
 }
 
 // Send password reset email to the user
 export async function sendResetPasswordEmail(email: string, userId: string) {
-  const token = await getAuthMethod(userId, 'reset-password'); // Fetch the token (credential) from AuthMethod table
+  const token = await createAuthMethod(userId, 'reset-password'); // Fetch the token (credential) from AuthMethod table
   const resetUrl = `https://account.internetfriends.xyz/reset-password?token=${token}`;
   await sendEmail({ email, subject: 'Reset your password', url: resetUrl });
 }

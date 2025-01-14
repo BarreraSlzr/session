@@ -1,3 +1,4 @@
+'use server'
 import { z } from "zod";
 import { createSession, deleteSession } from "./lib/session";
 import { createUser, getUser, createPassword, verifyPassword } from "./db/queries";

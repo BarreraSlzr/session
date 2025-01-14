@@ -1,5 +1,5 @@
 import { totp } from 'otplib';
-import { createAuthMethod, getAuthMethod, deleteUserAuthMethod } from '@/app/(auth)/db/queries';
+import { createAuthMethod, verifyCredential } from '@/app/(auth)/db/queries';
 
 // Generate MFA Secret for a user
 export async function generateMfaSecret(userId: string) {
@@ -11,16 +11,11 @@ export async function generateMfaSecret(userId: string) {
 
 // Verify MFA Token
 export async function verifyMfaToken(userId: string, token: string) {
-  const mfa = await getAuthMethod(userId, 'mfa');
+  const mfa = await verifyCredential('mfa', token);
   
-  if (!mfa) {
+  if (!mfa || mfa.userId !== userId ) {
     throw new Error("MFA secret not found for user.");
   }
 
   return totp.check(token, mfa.credential);
-}
-
-// Delete MFA Secret for a user
-export async function deleteMfaSecret(userId: string) {
-  await deleteUserAuthMethod(userId, 'mfa');
 }
