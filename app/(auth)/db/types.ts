@@ -9,7 +9,6 @@ export interface UserTable extends BaseTable {
   email: string;
 }
 
-
 export type TType = 'session' | 'mfa' | 'web-authn' | 'password' | 'email' | 'reset-password'
 export interface AuthMethodTable extends BaseTable {
   userId: string; // UUID

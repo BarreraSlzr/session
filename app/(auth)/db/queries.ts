@@ -2,185 +2,157 @@ import { db, sql } from ".";
 import { hash, genSalt, compare } from "bcrypt-ts";
 import { TType } from "./types";
 
-export async function createPassword(userId: string, rawPassword: string) {
+// Utility functions for common tasks
+const generateHashedPassword = async (password: string): Promise<string> => {
   const salt = await genSalt(10);
-  const hashedPassword = await hash(rawPassword, salt);
+  return hash(password, salt);
+};
 
-  return await db
-    .insertInto('AuthMethod')
-    .values({
-      userId,
-      type: 'password',
-      credential: hashedPassword,
-    })
-    .returningAll()
-    .executeTakeFirstOrThrow();
-}
+const isPasswordValid = async (rawPassword: string, hashedPassword: string): Promise<boolean> => {
+  return compare(rawPassword, hashedPassword);
+};
 
-export async function updatePassword(userId: string, currentPassword: string, newPassword: string) {
-  // Fetch the current password hash from the database
-  const authMethod = await db
+const getAuthMethodByType = async (userId: string, type: TType) => {
+  return db
     .selectFrom('AuthMethod')
     .selectAll()
     .where('userId', '=', userId)
-    .where('type', '=', 'password')
+    .where('type', '=', type)
     .executeTakeFirst();
+};
 
-  if (!authMethod) {
-    throw new Error("User does not have a password set.");
-  }
+const getAuthMethodByCredential = async (type: TType, credential: string) => {
+  return db
+    .selectFrom('AuthMethod')
+    .selectAll()
+    .where('type', '=', type)
+    .where('credential', '=', credential)
+    .executeTakeFirst();
+};
 
-  // Verify the current password
-  const isPasswordValid = await compare(currentPassword, authMethod.credential);
-  if (!isPasswordValid) {
-    throw new Error("Current password is incorrect.");
-  }
-
-  // Generate a hash for the new password
-  const salt = await genSalt(10);
-  const hashedPassword = await hash(newPassword, salt);
-
-  // Update the password in the database
-  return await db
+const updateAuthMethod = async (userId: string, type: TType, credential: string) => {
+  return db
     .updateTable('AuthMethod')
-    .set({ credential: hashedPassword })
+    .set({ credential })
     .where('userId', '=', userId)
-    .where('type', '=', 'password')
+    .where('type', '=', type)
     .returningAll()
     .executeTakeFirstOrThrow();
-}
+};
 
-export async function resetPassword(userId: string, token: string, newPassword: string) {
-  // Verify the email token
-  const isTokenValid = await verifyCredential("email", userId, token);
-  if (!isTokenValid) {
-    throw new Error("Invalid or expired email verification token.");
-  }
-
-  // Generate a hash for the new password
-  const salt = await genSalt(10);
-  const hashedPassword = await hash(newPassword, salt);
-
-  // Update the password in the database
+// CRUD Operations for User
+export async function createUser(email: string) {
   return await db
-    .updateTable('AuthMethod')
-    .set({ credential: hashedPassword })
-    .where('userId', '=', userId)
-    .where('type', '=', 'password')
+    .insertInto('User')
+    .values({ email })
     .returningAll()
     .executeTakeFirstOrThrow();
 }
 
-export async function verifyPassword(userId: string, rawPassword: string): Promise<boolean> {
-  const authMethod = await db
-    .selectFrom('AuthMethod')
+export async function getUser(email: string) {
+  return db
+    .selectFrom('User')
     .selectAll()
-    .where('userId', '=', userId)
-    .where('type', '=', 'password')
+    .where('email', '=', email)
     .executeTakeFirst();
-
-  if (!authMethod) return false;
-
-  return await compare(rawPassword, authMethod.credential);
 }
 
-export async function validateSession(sessionToken: string): Promise<boolean> {
-  const session = await db
-    .selectFrom('AuthMethod')
-    .selectAll()
-    .where('type', '=', 'session')
-    .where('credential', '=', sessionToken)
-    .executeTakeFirst();
-
-  if (session && (!session.expiresAt || new Date(session.expiresAt) > new Date())) {
-    return true;
-  }
-  return false;
-}
-
-export async function renewSession(sessionToken: string) {
-  // Retrieve the existing session
-  const session = await db
-    .selectFrom('AuthMethod')
-    .selectAll()
-    .where('type', '=', 'session')
-    .where('credential', '=', sessionToken)
-    .executeTakeFirst();
-
-  if (!session) {
-    throw new Error("Session not found or expired.");
-  }
-
-  // Delete the old session
-  await db
-    .deleteFrom('AuthMethod')
-    .where('id', '=', session.id)
-    .execute();
-
-  // Create a new session for the same user
-  const newSession = await db
-    .insertInto('AuthMethod')
-    .values({
-      userId: session.userId,
-      type: 'session',
-    })
-    .returningAll()
-    .executeTakeFirstOrThrow();
-
-  return newSession;
-}
-
-export async function createAuthMethod(userId: string, type: TType) {
-  return await db
+// Auth Method Operations
+export async function createAuthMethod(userId: string, type: TType, credential?: string) {
+  return db
     .insertInto('AuthMethod')
     .values({
       userId,
       type,
-      credential: sql`gen_random_uuid()`,  // or another method to generate credentials
+      credential: credential || sql`gen_random_uuid()`,
     })
     .returningAll()
     .executeTakeFirstOrThrow();
 }
 
-export async function getAuthMethod(userId: string, type: TType) {
-  return await db
-    .selectFrom('AuthMethod')
-    .select('credential')
-    .where('userId', '=', userId)
-    .where('type', '=', type)
-    .executeTakeFirst();
-}
-
-export async function deleteUserAuthMethod(userId: string, type: TType) {
-  return await db
+export async function deleteAuthMethodByType(userId: string, type: TType) {
+  return db
     .deleteFrom('AuthMethod')
     .where('userId', '=', userId)
     .where('type', '=', type)
     .execute();
 }
 
-export async function deleteTokenAuthMethod(token: string, type: TType) {
-  await db
+export async function deleteAuthMethodByToken(token: string, type: TType) {
+  return db
     .deleteFrom('AuthMethod')
     .where('type', '=', type)
     .where('credential', '=', token)
     .execute();
 }
 
-export async function verifyCredential(
-  type: TType,
-  userId: string,
-  credential: string
-): Promise<boolean> {
-  const authMethod = await db
-    .selectFrom('AuthMethod')
-    .selectAll()
-    .where('userId', '=', userId)
-    .where('type', '=', type)
-    .where('credential', '=', credential)
-    .executeTakeFirst();
+// Password Management
+export async function createPassword(userId: string, rawPassword: string) {
+  const hashedPassword = await generateHashedPassword(rawPassword);
+  return createAuthMethod(userId, 'password', hashedPassword);
+}
 
-  if (authMethod) {
+export async function updatePassword(userId: string, currentPassword: string, newPassword: string) {
+  const authMethod = await getAuthMethodByType(userId, 'password');
+
+  if (!authMethod) {
+    throw new Error("User does not have a password set.");
+  }
+
+  const isValid = await isPasswordValid(currentPassword, authMethod.credential);
+  if (!isValid) {
+    throw new Error("Current password is incorrect.");
+  }
+
+  const hashedPassword = await generateHashedPassword(newPassword);
+  return updateAuthMethod(userId, 'password', hashedPassword);
+}
+
+export async function resetPassword(userId: string, token: string, newPassword: string) {
+  const isValid = await verifyCredential('email', userId, token);
+  if (!isValid) {
+    throw new Error("Invalid or expired token.");
+  }
+
+  const hashedPassword = await generateHashedPassword(newPassword);
+  return updateAuthMethod(userId, 'password', hashedPassword);
+}
+
+export async function verifyPassword(userId: string, rawPassword: string): Promise<boolean> {
+  const authMethod = await getAuthMethodByType(userId, 'password');
+
+  if (!authMethod) return false;
+
+  return isPasswordValid(rawPassword, authMethod.credential);
+}
+
+// Session Management
+export async function createSession(userId: string) {
+  return createAuthMethod(userId, 'session');
+}
+
+export async function renewSession(sessionToken: string) {
+  const session = await getAuthMethodByCredential('session', sessionToken);
+
+  if (!session) {
+    throw new Error("Session not found or expired.");
+  }
+
+  await deleteAuthMethodByToken(sessionToken, 'session');
+  return createSession(session.userId);
+}
+
+export async function validateSession(sessionToken: string): Promise<boolean> {
+  const session = await getAuthMethodByCredential('session', sessionToken);
+
+  return !!session && (!session.expiresAt || new Date(session.expiresAt) > new Date());
+}
+
+// Credential Verification
+export async function verifyCredential(type: TType, userId: string, credential: string): Promise<boolean> {
+  const authMethod = await getAuthMethodByCredential(type, credential);
+
+  if (authMethod && authMethod.userId === userId) {
     await db
       .updateTable('AuthMethod')
       .set({ verifiedAt: sql`now()` })
@@ -190,16 +162,4 @@ export async function verifyCredential(
   }
 
   return false;
-}
-
-export async function getUser(email: string) {
-  // Fetch the user from the User table by email
-  const user = await db
-    .selectFrom('User')
-    .selectAll()
-    .where('email', '=', email)
-    .executeTakeFirst();
-
-  // Return the user found
-  return user;
 }

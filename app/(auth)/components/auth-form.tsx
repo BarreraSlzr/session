@@ -1,34 +1,56 @@
-'use client'
+"use client"
 
-import { useRouter } from 'next/navigation'
-import { useActionState, useEffect, useState } from 'react'
-import { toast } from 'sonner'
-import { login, register, type LoginActionState, type RegisterActionState } from '@/app/(auth)/actions'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { SubmitButton } from './submit-button'
+import { useRouter, useSearchParams } from "next/navigation"
+import { useActionState, useEffect } from "react"
+import { toast } from "sonner"
+import {
+  login,
+  register,
+  type LoginActionState,
+  type RegisterActionState,
+} from "@/app/(auth)/actions"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { SubmitButton } from "./submit-button"
+import { useWebAuthn } from "../hooks/useWebAuthn"
 
 type AuthFormProps = {
-  type: 'login' | 'register'
+  type: "login" | "register"
   children?: React.ReactNode
-  defaultEmail?: string
 }
 
-export function AuthForm({ type, children, defaultEmail = '' }: AuthFormProps) {
+export function AuthForm({ type, children }: AuthFormProps) {
   const router = useRouter()
-  const [email, setEmail] = useState(defaultEmail)
-  const [isSuccessful, setIsSuccessful] = useState(false)
+  const searchParams = useSearchParams()
+  const emailParam = searchParams.get("email") || ""
+  const { handleWebAuthnLogin, isLoading: isWebAuthnLoading } = useWebAuthn()
 
-  const [loginState, loginAction] = useActionState<LoginActionState, FormData>(login, {
-    status: 'idle',
-  })
+  const [loginState, loginAction] = useActionState<LoginActionState, FormData>(
+    login,
+    { status: "idle" }
+  )
 
-  const [registerState, registerAction] = useActionState<RegisterActionState, FormData>(register, {
-    status: 'idle',
-  })
+  const [registerState, registerAction] = useActionState<
+    RegisterActionState,
+    FormData
+  >(register, { status: "idle" })
+
+  const [webAuthnState, webAuthnAction] = useActionState<LoginActionState, FormData>(
+    async (state: LoginActionState, formData: FormData) => {
+      const email = formData.get("email") as string
+      if (email) {
+        const success = await handleWebAuthnLogin(email)
+        return success ? { status: "success" } : { status: "failed" }
+      } else {
+        toast.error("Please enter your email for WebAuthn login")
+        return { status: "invalid_data" }
+      }
+    },
+    { status: "idle" }
+  )
 
   useEffect(() => {
-    if (type === 'login') {
+    if (type === "login") {
       handleLoginState(loginState)
     } else {
       handleRegisterState(registerState)
@@ -36,149 +58,112 @@ export function AuthForm({ type, children, defaultEmail = '' }: AuthFormProps) {
   }, [loginState, registerState, type])
 
   const handleLoginState = (state: LoginActionState) => {
-    if (state.status === 'failed') {
-      toast.error('Invalid credentials!')
-    } else if (state.status === 'invalid_data') {
-      toast.error('Failed validating your submission!')
-    } else if (state.status === 'success') {
-      setIsSuccessful(true)
+    if (state.status === "failed") {
+      toast.error("Invalid credentials!")
+    } else if (state.status === "invalid_data") {
+      toast.error("Failed validating your submission!")
+    } else if (state.status === "success") {
       router.refresh()
     }
   }
 
   const handleRegisterState = (state: RegisterActionState) => {
-    if (state.status === 'user_exists') {
-      toast.error('Account already exists')
-    } else if (state.status === 'failed') {
-      toast.error('Failed to create account')
-    } else if (state.status === 'invalid_data') {
-      toast.error('Failed validating your submission!')
-    } else if (state.status === 'success') {
-      toast.success('Account created successfully')
-      setIsSuccessful(true)
+    if (state.status === "user_exists") {
+      toast.error("Account already exists")
+    } else if (state.status === "failed") {
+      toast.error("Failed to create account")
+    } else if (state.status === "invalid_data") {
+      toast.error("Failed validating your submission!")
+    } else if (state.status === "success") {
+      toast.success("Account created successfully")
       router.refresh()
     }
   }
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    const form = event.currentTarget
-    const formData = new FormData(form)
-    setEmail(formData.get('email') as string)
+    event.preventDefault();
+    const form = event.currentTarget;
+    const formData = new FormData(form);
 
-    const submitter = (event.nativeEvent as SubmitEvent).submitter as HTMLButtonElement
-    if (submitter.id === 'login') {
-      loginAction(formData)
-    } else if (submitter.id === 'register') {
-      registerAction(formData)
+    const submitter = (event.nativeEvent as SubmitEvent)
+      .submitter as HTMLButtonElement;
+    if (submitter.id === "login") {
+      loginAction(formData);
+    } else if (submitter.id === "register") {
+      registerAction(formData);
+    } else if (submitter.id === "webauthn-login") {
+      webAuthnAction(formData);
     }
-  }
+  };
 
-  const handleWebAuthnLogin = async () => {
-    try {
-      const publicKeyCredentialRequestOptions = await fetch('/api/auth/webauthn/request', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
-      }).then((res) => res.json())
+  const commonFormFields: IFormField[] = [
+    {
+      name: "email",
+      label: "Email",
+      children: (
+        <Input
+          id="email"
+          name="email"
+          required
+          defaultValue={emailParam}
+        />
+      ),
+    },
+    {
+      name: "password",
+      label: "Password",
+      children: <Input id="password" name="password" type="password" />,
+    },
+  ]
 
-      const assertion = await navigator.credentials.get({
-        publicKey: publicKeyCredentialRequestOptions,
-      })
-
-      const response = await fetch('/api/auth/webauthn/verify', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ assertion }),
-      })
-
-      if (response.ok) {
-        toast.success('WebAuthn login successful')
-        setIsSuccessful(true)
-        router.refresh()
-      } else {
-        toast.error('WebAuthn login failed')
-      }
-    } catch (error) {
-      toast.error('WebAuthn login error')
-    }
+  const actions: Record<"login" | "register", IAction[]> = {
+    login: [
+      {
+        children: (
+          <SubmitButton id="login" isLoading={loginState.status === "in_progress"}>
+            Login
+          </SubmitButton>
+        ),
+        handler: loginAction,
+      },
+      {
+        children: (
+          <SubmitButton id="webauthn-login" isLoading={webAuthnState.status === "in_progress"}>
+            Login with WebAuthn
+          </SubmitButton>
+        ),
+        handler: webAuthnAction,
+      },
+    ],
+    register: [
+      {
+        children: (
+          <SubmitButton id="register" isLoading={registerState.status === "in_progress"}>
+            Register
+          </SubmitButton>
+        ),
+        handler: registerAction,
+      },
+    ],
   }
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4 px-4 sm:px-16">
-      <div className="flex flex-col gap-2">
-        <Label
-          htmlFor="email"
-          className="text-zinc-600 font-normal dark:text-zinc-400"
-        >
-          Correo electrónico
-        </Label>
-        <Input
-          id="email"
-          name="email"
-          className="bg-muted text-md md:text-sm"
-          type="email"
-          placeholder="hola@internetfriends.xyz"
-          autoComplete="email"
-          required
-          autoFocus
-          defaultValue={email}
-        />
-      </div>
-      <div className="flex flex-col gap-2">
-        <Label
-          htmlFor="password"
-          className="text-zinc-600 font-normal dark:text-zinc-400"
-        >
-          Contraseña
-        </Label>
-        <Input
-          id="password"
-          name="password"
-          className="bg-muted text-md md:text-sm"
-          type="password"
-          required
-        />
-      </div>
-      {type === 'login' && (
-        <div className="flex flex-col gap-2">
-          <button
-            type="button"
-            className="mt-4 bg-blue-500 text-white py-2 px-4 rounded"
-            onClick={handleWebAuthnLogin}
-          >
-            Login with WebAuthn
-          </button>
+      {commonFormFields.map(({ name, label, children }) => (
+        <div key={name} className="flex flex-col gap-2">
+          <Label htmlFor={name}>{label}</Label>
+          {children}
         </div>
-      )}
-      {type === 'register' && (
-        <div className="flex flex-col gap-2">
-          <Label
-            htmlFor="verificationCode"
-            className="text-zinc-600 font-normal dark:text-zinc-400"
-          >
-            Verification Code
-          </Label>
-          <Input
-            id="verificationCode"
-            name="verificationCode"
-            className="bg-muted text-md md:text-sm"
-            type="text"
-            placeholder="Enter your verification code"
-          />
-        </div>
-      )}
-      <SubmitButton
-        id={type}
-        isSuccessful={isSuccessful}
-      >
-        {type === 'login' ? 'Iniciar sesión' : 'Crear cuenta'}
-      </SubmitButton>
+      ))}
+      <div className="flex flex-col gap-2">
+        {actions[type].map((action, index) => (
+          <div key={index}>
+              {action.children}
+          </div>
+        ))}
+      </div>
       {children}
     </form>
   )
 }
+
