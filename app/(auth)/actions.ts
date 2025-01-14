@@ -2,14 +2,14 @@
 
 import { z } from 'zod';
 
-import { createUser, getUser, getUserByToken, updateUserPassword, createSession, validateSession, renewSession, deleteSession } from '@/lib/db/queries';
-import { sendVerificationEmail } from '@/lib/email/sendVerificationEmail';
-import { sendResetEmail } from '@/lib/email/sendResetEmail';
+import { createUser, getUser, getUserByToken, updateUserPassword, createSession, validateSession, renewSession, deleteSession } from '@/app/(auth)/db/queries';
+import { sendVerificationEmail } from '@/lib/lib/email/sendVerificationEmail';
+import { sendResetEmail } from '@/lib/lib/email/sendResetEmail';
 import { generateToken } from '@/lib/auth/generateToken';
-import { verifyToken } from '@/lib/auth/verifyToken';
+import { verifyToken } from '@/app/(auth)/lib/verifyToken';
 
 import { signIn } from './auth';
-import { setSessionCookie } from '@/lib/auth/session';
+import { setSessionCookie } from '@/app/(auth)/lib/session';
 
 const authFormSchema = z.object({
   email: z.string().email(),

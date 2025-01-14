@@ -1,7 +1,7 @@
 import NextAuth from 'next-auth';
 import { NextRequest, NextResponse } from 'next/server';
 import { authConfig } from '@/app/(auth)/auth.config';
-import { handleRedirect } from '@/lib/redirect';
+import { handleRedirect } from '@/app/(auth)/lib/redirect';
 
 export default NextAuth(authConfig).auth;
 

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { AuthForm } from '@/components/auth-form';
+import { AuthForm } from '@/app/(auth)/components/auth-form';
 import Header from '@/app/(internetfriends)/components/header';
 import NoiseFilter from '@/app/(internetfriends)/components/backgrounds/noise-filter-div';
 import { BgGoo } from '@/app/(internetfriends)/components/backgrounds/gloo';

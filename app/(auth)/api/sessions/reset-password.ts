@@ -1,9 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { validatePassword } from '@/lib/auth/validatePassword';
+import { validatePassword } from '@/app/(auth)/lib/validatePassword';
 import { generateToken } from '@/lib/auth/generateToken';
-import { verifyToken } from '@/lib/auth/verifyToken';
-import { sendResetEmail } from '@/lib/email/sendResetEmail';
-import { getUser, getUserByToken, updateUserPassword } from '@/lib/db/queries';
+import { verifyToken } from '@/app/(auth)/lib/verifyToken';
+import { sendResetEmail } from '@/lib/lib/email/sendResetEmail';
+import { getUser, getUserByToken, updateUserPassword } from '@/app/(auth)/db/queries';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {

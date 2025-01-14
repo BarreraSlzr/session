@@ -2,10 +2,10 @@ import { compare } from 'bcrypt-ts';
 import NextAuth, { type User, type Session } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 
-import { getUser } from '@/lib/db/queries';
+import { getUser } from '@/app/(auth)/db/queries';
 
 import { authConfig } from './auth.config';
-import { createSession, validateSession, renewSession, deleteSession } from '@/lib/auth/session';
+import { createSession, validateSession, renewSession, deleteSession } from '@/app/(auth)/lib/session';
 
 interface ExtendedSession extends Session {
   user: User;

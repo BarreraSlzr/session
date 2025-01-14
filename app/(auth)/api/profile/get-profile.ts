@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getUser } from '@/lib/db/queries';
-import { validateSession } from '@/lib/auth/session';
+import { getUser } from '@/app/(auth)/db/queries';
+import { validateSession } from '@/app/(auth)/lib/session';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const sessionToken = req.cookies.session;
