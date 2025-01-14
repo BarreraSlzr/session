@@ -1,6 +1,7 @@
 'use server';
 
 import { z } from 'zod';
+import { NextResponse } from 'next/server';
 
 import { createUser, getUser, getUserByToken, updateUserPassword, createSession, validateSession, renewSession, deleteSession } from '@/app/(auth)/db/queries';
 import { sendVerificationEmail } from '@/lib/lib/email/sendVerificationEmail';
@@ -23,6 +24,7 @@ export interface LoginActionState {
 export const login = async (
   _: LoginActionState,
   formData: FormData,
+  res: NextResponse
 ): Promise<LoginActionState> => {
   try {
     const validatedData = authFormSchema.parse({
@@ -68,6 +70,7 @@ export interface RegisterActionState {
 export const register = async (
   _: RegisterActionState,
   formData: FormData,
+  res: NextResponse
 ): Promise<RegisterActionState> => {
   try {
     const validatedData = authFormSchema.parse({
