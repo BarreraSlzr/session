@@ -3,10 +3,8 @@
 import { z } from 'zod';
 import { NextResponse } from 'next/server';
 
-import { createUser, getUser, getUserByToken, updateUserPassword, createSession, validateSession, renewSession, deleteSession } from '@/app/(auth)/db/queries';
-import { sendVerificationEmail } from '@/app/(auth)/lib/email';
-import { sendResetEmail } from '@/app/(auth)/lib/email';
-import { generateToken } from '@/app/(auth)/lib/auth/generateToken';
+import { createUser, getUser, getUserByToken, updateUserPassword, createSession, validateSession, renewSession, deleteSession, getAuthMethod } from '@/app/(auth)/db/queries';
+import { sendVerificationEmail, sendResetPasswordEmail } from '@/app/(auth)/lib/email';
 import { verifyToken } from '@/app/(auth)/lib/verifyToken';
 
 import { signIn } from '@/app/(auth)/auth';
@@ -113,8 +111,7 @@ export const requestPasswordReset = async (email: string): Promise<void> => {
     throw new Error('User not found');
   }
 
-  const resetToken = await generateToken(32);
-  await sendResetEmail(email, resetToken);
+  await sendResetPasswordEmail(email, user.id);
 };
 
 export const resetPassword = async (token: string, newPassword: string): Promise<void> => {
