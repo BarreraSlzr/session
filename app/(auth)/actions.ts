@@ -30,7 +30,7 @@ export const login = async (
       password: formData.get('password'),
     });
 
-    const [user] = await getUser(validatedData.email);
+    const user = await getUser(validatedData.email);
 
     if (!user) {
       return { status: 'failed' };
@@ -75,7 +75,7 @@ export const register = async (
       password: formData.get('password'),
     });
 
-    const [user] = await getUser(validatedData.email);
+    const user = await getUser(validatedData.email);
 
     if (user) {
       return { status: 'user_exists' } as RegisterActionState;
@@ -105,7 +105,7 @@ export const register = async (
 };
 
 export const requestPasswordReset = async (email: string): Promise<void> => {
-  const [user] = await getUser(email);
+  const user = await getUser(email);
   if (!user) {
     throw new Error('User not found');
   }

@@ -16,21 +16,21 @@ export const authConfig = {
       credentials: {},
       async authorize({ email, password }: any) {
         // Fetch user information by email
-        const users = await getUser(email);
-        if (users.length === 0) return null;
+        const user = await getUser(email);
+        if (!user) return null;
 
         // Fetch the email-based credential (token) for MFA, WebAuthn, or email-based verification
-        const authMethod = await getAuthMethod(email, 'email');  // 'email' as the auth method
+        const authMethod = await getAuthMethod(user.id, 'email');  // 'email' as the auth method
         if (!authMethod) return null;  // If no email token exists, deny access
 
         // Verify the password using the custom verifyPassword function
-        const passwordIsValid = await verifyPassword(users[0].id, password);
+        const passwordIsValid = await verifyPassword(user.id, password);
         if (!passwordIsValid) return null;
 
         // Now, create the session and return the user info along with the credential
         const session = {
-          id: users[0].id,
-          email: users[0].email,
+          id: user.id,
+          email: user.email,
           credential: authMethod.credential,  // Store the credential (e.g., token) in the session
         };
         return session;  // Return session object directly

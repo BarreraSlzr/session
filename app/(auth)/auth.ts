@@ -1,9 +1,5 @@
 import { authConfig } from '@/app/(auth)/auth.config';
-import NextAuth, { type User, type Session } from 'next-auth';
-
-interface ExtendedSession extends Session {
-  user: User;
-}
+import NextAuth from 'next-auth/next';
 
 export const {
   handlers: { GET, POST },

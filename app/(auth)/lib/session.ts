@@ -31,12 +31,11 @@ export const sessionTokenConfig: {name: string, options: SerializeOptions} = {
     httpOnly: true, // Make the cookie inaccessible to JavaScript (important for security)
     secure: process.env.NODE_ENV === 'production', // Use secure cookies only in production
     sameSite: 'lax', // CSRF protection
-    domain: '.InternetFriends.xyz', // Adjust domain as necessary (make sure it matches your app domain)
+    domain: '.internetfriends.xyz', // Adjust domain as necessary (make sure it matches your app domain)
     path: '/', // The cookie will be sent for requests to the root and any subpaths
     maxAge: 60 * 60 * 24 * 7, // 1 week
   },
 };
-
 
 export function setSessionCookie(res: any, token: string) {
   const cookie = serialize(sessionTokenConfig.name, token, sessionTokenConfig.options);
@@ -45,7 +44,10 @@ export function setSessionCookie(res: any, token: string) {
 }
 
 export function clearSessionCookie(res: any) {
-  const cookie = serialize(sessionTokenConfig.name, '', sessionTokenConfig.options);
+  const cookie = serialize(sessionTokenConfig.name, '', {
+    ...sessionTokenConfig.options,
+    maxAge: 0,
+  });
 
   res.setHeader('Set-Cookie', cookie);
 }

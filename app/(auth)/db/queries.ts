@@ -2,7 +2,6 @@ import { db, sql } from ".";
 import { hash, genSalt, compare } from "bcrypt-ts";
 import { TType } from "./types";
 
-
 export async function createPassword(userId: string, rawPassword: string) {
   const salt = await genSalt(10);
   const hashedPassword = await hash(rawPassword, salt);
@@ -168,7 +167,6 @@ export async function deleteTokenAuthMethod(token: string, type: TType) {
     .execute();
 }
 
-
 export async function verifyCredential(
   type: TType,
   userId: string,
@@ -196,12 +194,12 @@ export async function verifyCredential(
 
 export async function getUser(email: string) {
   // Fetch the user from the User table by email
-  const users = await db
+  const user = await db
     .selectFrom('User')
     .selectAll()
     .where('email', '=', email)
-    .execute();
+    .executeTakeFirst();
 
-  // Return the users found (returns an array, even if only one user is found)
-  return users;
+  // Return the user found
+  return user;
 }

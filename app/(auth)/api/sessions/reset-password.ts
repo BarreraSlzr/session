@@ -13,7 +13,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ error: 'Email is required' });
     }
 
-    const [user] = await getUser(email);
+    const user = await getUser(email);
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
