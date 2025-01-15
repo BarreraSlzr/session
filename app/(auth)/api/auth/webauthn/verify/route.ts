@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { verifyWebAuthnAssertion } from "@/app/(auth)/lib/webauthn";
 
 export async function POST(req: Request) {
   try {
