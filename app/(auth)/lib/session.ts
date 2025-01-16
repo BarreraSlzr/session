@@ -27,6 +27,18 @@ export async function deleteSession(token: string) {
   await clearSessionCookie();
 }
 
+export async function getUserIdFromSession() {
+  const cookieStore = await cookies();
+  const sessionToken = cookieStore.get(sessionTokenConfig.name)?.value;
+  if (!sessionToken) {
+    throw new Error("Session token not found");
+  }
+  const session = await validateSessionDB(sessionToken);
+  if (!session) {
+    throw new Error("Invalid session token");
+  }
+  return session.userId;
+}
 
 export const sessionTokenConfig: { name: string; options: Object } = {
   name: 'session', // Cookie name for the session
