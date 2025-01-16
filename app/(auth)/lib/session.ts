@@ -22,8 +22,13 @@ export async function renewSession(token: string) {
   return newSession;
 }
 
-export async function deleteSession(token: string) {
-  await deleteAuthMethodByToken(token, "session");
+export async function deleteSession() {
+  const cookieStore = await cookies();
+  const sessionToken = cookieStore.get(sessionTokenConfig.name)?.value;
+  if (!sessionToken) {
+    throw new Error("Session token not found");
+  }
+  await deleteAuthMethodByToken(sessionToken, "session");
   await clearSessionCookie();
 }
 
