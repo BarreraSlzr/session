@@ -3,55 +3,56 @@ import {
   generateAuthenticationOptions as simpleGenerateAuthenticationOptions,
   verifyRegistrationResponse as simpleVerifyRegistrationResponse,
   verifyAuthenticationResponse as simpleVerifyAuthenticationResponse,
+  GenerateRegistrationOptionsOpts,
+  VerifyRegistrationResponseOpts,
+  VerifyAuthenticationResponseOpts,
 } from '@simplewebauthn/server';
+import { AuthMethod } from '../db/types';
 
-export function generateRegistrationOptions() {
-  return simpleGenerateRegistrationOptions({
-    rpName: 'Your App Name',
-    rpID: 'your-app-id',
-    userID: 'user-id',
-    userName: 'user-name',
-    attestationType: 'direct',
-    authenticatorSelection: {
-      authenticatorAttachment: 'platform',
-      requireResidentKey: false,
-      userVerification: 'preferred',
-    },
-    timeout: 60000,
-    excludeCredentials: [],
-    extensions: {},
-  });
-}
-
-export function generateAuthenticationOptions() {
-  return simpleGenerateAuthenticationOptions({
-    timeout: 60000,
-    rpID: 'your-app-id',
-    allowCredentials: [],
+const baseWebAuthConfig: Omit<GenerateRegistrationOptionsOpts, 'userID' | 'userName'> = {
+  rpName: 'Your App Name',
+  rpID: 'your-app-id',
+  attestationType: 'direct',
+  authenticatorSelection: {
+    authenticatorAttachment: 'platform',
+    requireResidentKey: false,
     userVerification: 'preferred',
-    extensions: {},
-  });
+  },
+  timeout: 60000,
+};
+
+export function generateRegistrationOptions(userID: string, userName: string) {
+  const WebAuthConfig: GenerateRegistrationOptionsOpts = {
+    ...baseWebAuthConfig,
+    userID: new Uint8Array(
+      Buffer.from(userID, "base64"),
+    ),
+    userName,
+  };
+  return simpleGenerateRegistrationOptions(WebAuthConfig);
 }
 
-export function verifyRegistrationResponse(response) {
-  return simpleVerifyRegistrationResponse({
-    credential: response,
-    expectedChallenge: 'expected-challenge',
-    expectedOrigin: 'https://your-app.com',
-    expectedRPID: 'your-app-id',
-  });
+export function generateAuthenticationOptions(challenge: string) {
+  return simpleGenerateAuthenticationOptions({ challenge, rpID: baseWebAuthConfig.rpID });
 }
 
-export function verifyAuthenticationResponse(response) {
+export function verifyRegistrationResponse(response: VerifyRegistrationResponseOpts['response'], challenge: string) {
+  return simpleVerifyRegistrationResponse({ response, expectedChallenge: challenge, expectedOrigin: 'https://your-app-origin' });
+}
+
+export function verifyAuthenticationResponse(response: VerifyAuthenticationResponseOpts['response'], authmethod: AuthMethod) {
   return simpleVerifyAuthenticationResponse({
-    credential: response,
-    expectedChallenge: 'expected-challenge',
-    expectedOrigin: 'https://your-app.com',
-    expectedRPID: 'your-app-id',
-    authenticator: {
+    response: response,
+    expectedChallenge: authmethod.credential,
+    expectedOrigin: origin,
+    expectedRPID: baseWebAuthConfig.rpID,
+    credential: {
+      id: authmethod.id,
+      publicKey: new Uint8Array(
+        Buffer.from(authmethod.userId, "base64"),
+      ),
       counter: 0,
-      credentialPublicKey: 'public-key',
-      credentialID: 'credential-id',
     },
+    requireUserVerification: false,
   });
 }
