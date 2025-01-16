@@ -153,3 +153,42 @@ export async function verifyCredential(type: TType, credential: string) {
 
   return undefined;
 }
+
+// WebAuthn Challenge and Passkey Management
+export async function createPasskey(userId: string, challenge: string) {
+  return createAuthMethod(userId, 'web-authn', challenge);
+}
+
+export async function getExpectedChallenge(userId: string) {
+  const authMethod = await getAuthMethodByType(userId, 'web-authn');
+  if (!authMethod || authMethod.verifiedAt) {
+    throw new Error("No valid challenge found for user.");
+  }
+  return authMethod.credential;
+}
+
+export async function getPasskeysByUserId(userId: string) {
+  return db
+    .selectFrom('AuthMethod')
+    .selectAll()
+    .where('userId', '=', userId)
+    .where('type', '=', 'web-authn')
+    .execute();
+}
+
+export async function deletePasskeyById(userId: string, passkeyId: string) {
+  return db
+    .deleteFrom('AuthMethod')
+    .where('userId', '=', userId)
+    .where('id', '=', passkeyId)
+    .execute();
+}
+
+export async function updatePasskeyNameById(userId: string, passkeyId: string, name: string) {
+  return db
+    .updateTable('AuthMethod')
+    .set({ credential: name })
+    .where('userId', '=', userId)
+    .where('id', '=', passkeyId)
+    .execute();
+}
