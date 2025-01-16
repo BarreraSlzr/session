@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { AuthForm } from '@/components/auth-form';
+import { AuthForm } from '@/app/(auth)/components/auth-form';
 import Header from '@/app/(internetfriends)/components/header';
 import { getRandomColors } from '@/app/(internetfriends)/lib/color-palette';
 import NoiseFilter from '@/app/(internetfriends)/components/backgrounds/noise-filter-div';
@@ -9,7 +9,7 @@ export default function Page() {
   const randomColors = getRandomColors();
   
   return (
-    <main className='flex flex-col h-dvh'>
+    <main className='flex flex-col h-full'>
       <div className="relative grow flex items-start md:items-center justify-center">
         <div className="w-full max-w-md overflow-hidden rounded-lg flex flex-col gap-12 bg-background mt-12 md:-mt-12 pb-12 z-10">
           <Header />

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { AuthForm } from '@/components/auth-form';
+import { AuthForm } from '@/app/(auth)/components/auth-form';
 import Header from '@/app/(internetfriends)/components/header';
 import NoiseFilter from '@/app/(internetfriends)/components/backgrounds/noise-filter-div';
 import { BgGoo } from '@/app/(internetfriends)/components/backgrounds/gloo';
@@ -8,9 +8,9 @@ import { getRandomColors } from '@/app/(internetfriends)/lib/color-palette';
 export default function Page() {
   const randomColors = getRandomColors();
   return (
-    <main className='flex flex-col h-dvh'>
+    <main className='flex flex-col h-full'>
       <div className="relative grow flex items-start md:items-center justify-center bg-background">
-        <div className="w-full max-w-md overflow-hidden rounded-2xl gap-12 flex flex-col bg-background mt-12 md:-mt-12 pb-12 z-10">
+        <div className="w-full max-w-md overflow-hidden rounded-lg gap-12 flex flex-col bg-background mt-12 md:-mt-12 pb-12 z-10">
           <Header />
           <div className="flex flex-col items-center justify-center gap-2 px-4 text-center sm:px-16">
             <h3 className="text-xl font-semibold dark:text-zinc-50">Regístrate</h3>

@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils"
+import { cn } from "@/app/(auth)/lib/utils"
 import { CardDescriptionToggle } from "./card-description-toggle"
 import { GridBackground } from "./backgrounds/grid-background"
 
