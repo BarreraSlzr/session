@@ -10,9 +10,9 @@ import {
   getPasskeysByUserId,
   deletePasskeyById,
   updatePasskeyNameById,
-  getExpectedChallenge,
+  getPasskeyChallenge,
+  getUser,
 } from "@/app/(auth)/db/queries";
-import { cookies } from "next/headers";
 import { getUserIdFromSession } from "@/app/(auth)/lib/session";
 
 export async function GET(req: Request) {
@@ -20,8 +20,9 @@ export async function GET(req: Request) {
   const userId = await getUserIdFromSession();
 
   if (pathname === "/passkey/generate-register-options") {
-    const options = generateRegistrationOptions();
-    await createPasskey(userId, options.challenge);
+    const challenge = await createPasskey(userId);
+    const user = await getUser(userId);
+    const options = await generateRegistrationOptions(challenge.userId, user.email);
     return NextResponse.json(options);
   }
 
@@ -39,17 +40,16 @@ export async function POST(req: Request) {
   const userId = await getUserIdFromSession();
 
   if (pathname === "/passkey/generate-authenticate-options") {
-    const options = generateAuthenticationOptions();
-    await createPasskey(userId, options.challenge);
+    const challenge = await createPasskey(userId);
+    const options = await generateAuthenticationOptions(challenge.credential);
     return NextResponse.json(options);
   }
 
   if (pathname === "/passkey/verify-registration") {
-    const expectedChallenge = await getExpectedChallenge(userId);
+    const passkey = await getPasskeyChallenge(userId);
     const verification = await verifyRegistrationResponse({
-      ...body,
-      expectedChallenge,
-    });
+      ...body
+    }, passkey.credential);
     if (verification.verified) {
       await updatePasskeyNameById(userId, body.credentialID, body.name);
       return NextResponse.json({ success: true });
@@ -58,11 +58,10 @@ export async function POST(req: Request) {
   }
 
   if (pathname === "/passkey/verify-authentication") {
-    const expectedChallenge = await getExpectedChallenge(userId);
+    const passkey = await getPasskeyChallenge(userId);
     const verification = await verifyAuthenticationResponse({
-      ...body,
-      expectedChallenge,
-    });
+      ...body
+    }, passkey);
     if (verification.verified) {
       return NextResponse.json({ success: true });
     }
