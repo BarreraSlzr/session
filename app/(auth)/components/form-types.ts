@@ -6,5 +6,5 @@ interface IFormField {
 
 interface IAction {
   children: React.ReactNode
-  handler: (formData: FormData, submitter: { id: string; name: string; value: string } | null) => void
+  onSubmit: (event: React.FormEvent<HTMLFormElement>, formData: FormData, submitterId: string) => void
 }
