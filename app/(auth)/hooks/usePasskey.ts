@@ -3,14 +3,14 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 
-export function useWebAuthn() {
+export function usePasskey() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
 
-  const handleWebAuthnLogin = async (email: string) => {
+  const handlePasskeyRequest = async (email: string) => {
     setIsLoading(true)
     try {
-      const publicKeyCredentialRequestOptions = await fetch('/api/auth/webauthn/request', {
+      const credentialRequestOptions = await fetch('/api/auth/passkey/...', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -19,10 +19,10 @@ export function useWebAuthn() {
       }).then((res) => res.json())
 
       const assertion = await navigator.credentials.get({
-        publicKey: publicKeyCredentialRequestOptions,
+        publicKey: credentialRequestOptions,
       })
 
-      const response = await fetch('/api/auth/webauthn/verify', {
+      const verifyResponse = await fetch('/api/auth/passkey/...', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -30,7 +30,7 @@ export function useWebAuthn() {
         body: JSON.stringify({ assertion }),
       })
 
-      if (response.ok) {
+      if (verifyResponse.ok) {
         toast.success('WebAuthn login successful')
         router.refresh()
         return true
@@ -46,6 +46,6 @@ export function useWebAuthn() {
     }
   }
 
-  return { handleWebAuthnLogin, isLoading }
+  return { handlePasskeyRequest, isLoading }
 }
 
