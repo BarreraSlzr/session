@@ -1,5 +1,5 @@
 import nodemailer from 'nodemailer';
-import { createAuthMethod } from '../db/queries';  // Assuming the token is stored as a credential in the AuthMethod table
+import { createAuthMethod } from '@/app/(auth)/lib/db/queries';  // Assuming the token is stored as a credential in the AuthMethod table
 
 const transporter = nodemailer.createTransport({
   service: 'Gmail',

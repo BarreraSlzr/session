@@ -1,10 +1,10 @@
 import { db, sql } from ".";
-import { generateHashedPassword, isPasswordValid } from "../lib/password";
-import { AuthMethod, TType } from "./types";
+import { generateHashedPassword, isPasswordValid } from "@/app/(auth)/lib/password";
+import { AuthMethod, TType } from "@/app/(auth)/lib/db/types";
 
 const getAuthMethodByType = async (userId: string, type: TType) => {
   return db
-    .selectFrom('AuthMethod')
+    .selectFrom('auth_method')
     .selectAll()
     .where('userId', '=', userId)
     .where('type', '=', type)
@@ -13,7 +13,7 @@ const getAuthMethodByType = async (userId: string, type: TType) => {
 
 const getAuthMethodByCredential = async (type: TType, credential: string): Promise<AuthMethod | undefined> => {
   return db
-    .selectFrom('AuthMethod')
+    .selectFrom('auth_method')
     .selectAll()
     .where('type', '=', type)
     .where('credential', '=', credential)
@@ -22,7 +22,7 @@ const getAuthMethodByCredential = async (type: TType, credential: string): Promi
 
 const updateAuthMethod = async (userId: string, type: TType, credential: string) => {
   return db
-    .updateTable('AuthMethod')
+    .updateTable('auth_method')
     .set({ credential })
     .where('userId', '=', userId)
     .where('type', '=', type)
@@ -33,7 +33,7 @@ const updateAuthMethod = async (userId: string, type: TType, credential: string)
 // CRUD Operations for User
 export async function createUser(email: string) {
   return await db
-    .insertInto('User')
+    .insertInto('user')
     .values({ email })
     .returningAll()
     .executeTakeFirstOrThrow();
@@ -41,7 +41,7 @@ export async function createUser(email: string) {
 
 export async function getUser(email: string) {
   return db
-    .selectFrom('User')
+    .selectFrom('user')
     .selectAll()
     .where('email', '=', email)
     .executeTakeFirstOrThrow();
@@ -50,7 +50,7 @@ export async function getUser(email: string) {
 // Auth Method Operations
 export async function createAuthMethod(userId: string, type: TType, credential?: string) {
   return db
-    .insertInto('AuthMethod')
+    .insertInto('auth_method')
     .values({
       userId,
       type,
@@ -62,7 +62,7 @@ export async function createAuthMethod(userId: string, type: TType, credential?:
 
 export async function deleteAuthMethodByType(userId: string, type: TType) {
   return db
-    .deleteFrom('AuthMethod')
+    .deleteFrom('auth_method')
     .where('userId', '=', userId)
     .where('type', '=', type)
     .execute();
@@ -70,7 +70,7 @@ export async function deleteAuthMethodByType(userId: string, type: TType) {
 
 export async function deleteAuthMethodByToken(token: string, type: TType) {
   return db
-    .deleteFrom('AuthMethod')
+    .deleteFrom('auth_method')
     .where('type', '=', type)
     .where('credential', '=', token)
     .execute();
@@ -147,7 +147,7 @@ export async function verifyCredential(type: TType, credential: string) {
 
   if (authMethod) {
     await db
-      .updateTable('AuthMethod')
+      .updateTable('auth_method')
       .set({ verifiedAt: sql`now()` })
       .where('id', '=', authMethod.id)
       .execute();
@@ -168,7 +168,7 @@ export async function getPasskeyChallenge(userId: string) {
 
 export async function getPasskeysByUserId(userId: string) {
   return db
-    .selectFrom('AuthMethod')
+    .selectFrom('auth_method')
     .selectAll()
     .where('userId', '=', userId)
     .where('type', '=', 'passkey')
@@ -177,7 +177,7 @@ export async function getPasskeysByUserId(userId: string) {
 
 export async function deletePasskeyById(userId: string, passkeyId: string) {
   return db
-    .deleteFrom('AuthMethod')
+    .deleteFrom('auth_method')
     .where('userId', '=', userId)
     .where('id', '=', passkeyId)
     .execute();
@@ -185,7 +185,7 @@ export async function deletePasskeyById(userId: string, passkeyId: string) {
 
 export async function updatePasskeyNameById(userId: string, passkeyId: string, name: string) {
   return db
-    .updateTable('AuthMethod')
+    .updateTable('auth_method')
     .set({ credential: name })
     .where('userId', '=', userId)
     .where('id', '=', passkeyId)

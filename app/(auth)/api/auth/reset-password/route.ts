@@ -1,5 +1,5 @@
 
-import { resetPassword } from "@/app/(auth)/db/queries";
+import { resetPassword } from "@/app/(auth)/lib/db/queries";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {

@@ -1,7 +1,7 @@
 'use server'
 import { z } from "zod";
 import { createSession, deleteSession } from "./lib/session";
-import { createUser, getUser, createPassword, verifyPassword } from "./db/queries";
+import { createUser, getUser, createPassword, verifyPassword } from "@/app/(auth)/lib/db/queries";
 
 const authFormSchema = z.object({
   email: z.string().email(),

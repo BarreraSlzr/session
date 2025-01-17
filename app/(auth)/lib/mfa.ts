@@ -1,5 +1,5 @@
 import { totp } from 'otplib';
-import { createAuthMethod, verifyCredential } from '@/app/(auth)/db/queries';
+import { createAuthMethod, verifyCredential } from '@/app/(auth)/lib/db/queries';
 
 // Generate MFA Secret for a user
 export async function generateMfaSecret(userId: string) {

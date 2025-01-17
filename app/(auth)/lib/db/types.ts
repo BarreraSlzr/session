@@ -22,6 +22,6 @@ export type User = Selectable<UserTable>;
 export type AuthMethod = Selectable<AuthMethodTable>;
 
 export interface Database {
-  User: UserTable;
-  AuthMethod: AuthMethodTable;
+  user: UserTable;
+  auth_method: AuthMethodTable;
 }

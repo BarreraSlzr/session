@@ -12,7 +12,7 @@ import {
   updatePasskeyNameById,
   getPasskeyChallenge,
   getUser,
-} from "@/app/(auth)/db/queries";
+} from "@/app/(auth)/lib/db/queries";
 import { getUserIdFromSession } from "@/app/(auth)/lib/session";
 
 export async function GET(req: Request) {

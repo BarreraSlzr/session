@@ -23,7 +23,7 @@ export function AuthForm({ type, children }: AuthFormProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const emailParam = searchParams.get("email") || ""
-  const { handleWebAuthnLogin, isLoading: isWebAuthnLoading } = useWebAuthn()
+  const { handleWebAuthnLogin } = useWebAuthn()
 
   const [loginState, loginAction] = useActionState<LoginActionState, FormData>(
     login,

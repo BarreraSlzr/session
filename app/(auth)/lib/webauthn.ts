@@ -7,7 +7,7 @@ import {
   VerifyRegistrationResponseOpts,
   VerifyAuthenticationResponseOpts,
 } from '@simplewebauthn/server';
-import { AuthMethod } from '../db/types';
+import { AuthMethod } from '@/app/(auth)/lib/db/types';
 
 const baseWebAuthConfig: Omit<GenerateRegistrationOptionsOpts, 'userID' | 'userName'> = {
   rpName: 'Your App Name',

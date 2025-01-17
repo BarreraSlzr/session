@@ -4,7 +4,7 @@ import {
   renewSession as renewSessionDB,
   createAuthMethod,
   deleteAuthMethodByToken,
-} from "@/app/(auth)/db/queries";
+} from "@/app/(auth)/lib/db/queries";
 
 export async function createSession(userId: string) {
   const session = await createAuthMethod(userId, "session");
