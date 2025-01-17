@@ -12,20 +12,20 @@ export async function middleware(req: NextRequest) {
   if (redirectUrl) {
     await setCookie('redirect', redirectUrl);
   }
-
-  const sessionToken = await getCookie('session');
-  if (!sessionToken || !(await validateSession(sessionToken))) {
+  try {
+    if( await validateSession() ){
+      const redirectUrlFromCookie = await getCookie('redirect');
+      if (redirectUrlFromCookie) {
+        const validatedUrl = handleRedirect(redirectUrlFromCookie, '/');
+        const response = NextResponse.redirect(validatedUrl);
+        await clearCookie('redirect');
+        return response;
+      }
+    }
+    return NextResponse.next();
+  } catch (error) {
     if (!['/create', '/register', '/600x600.jpg'].includes(req.nextUrl.pathname)) {
       return NextResponse.redirect(new URL('/create', req.url));
     }
-  } else {
-    const redirectUrlFromCookie = await getCookie('redirect');
-    if (redirectUrlFromCookie) {
-      const validatedUrl = handleRedirect(redirectUrlFromCookie, '/');
-      const response = NextResponse.redirect(validatedUrl);
-      await clearCookie('redirect');
-      return response;
-    }
   }
-  return NextResponse.next();
 }
