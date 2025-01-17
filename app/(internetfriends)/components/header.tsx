@@ -1,4 +1,3 @@
-
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowUpRight } from 'lucide-react';
@@ -39,7 +38,7 @@ export default function Header() {
 
             <Link href="/samples" className="flex items-center gap-1 hover:opacity-70 transition-opacity">
                 {content.headerLink}
-                <ArrowUpRight className="h-4 w-4" />
+                <ArrowUpRight className="size-4" />
             </Link>
         </header>
     );

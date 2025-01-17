@@ -205,7 +205,7 @@ export function BgGoo({
   return (
     <motion.div
       ref={containerRef}
-      className="w-full h-full"
+      className="size-full"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 1, ease: "easeOut" }}
@@ -214,7 +214,7 @@ export function BgGoo({
         ref={canvasRef}
         width={size.width}
         height={size.height}
-        className="w-full h-full"
+        className="size-full"
         />
     </motion.div>
   )

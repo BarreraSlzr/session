@@ -23,7 +23,7 @@ export default function HeroText({ children = <DefaultHero />, className }: Prop
     const randomColors = useMemo(() => getRandomColors(), []);
     return (
         <section className={`relative min-h-[60vh] ${className}`}>
-            <div className="absolute inset-0 w-full h-full pointer-events-none z-0">
+            <div className="absolute inset-0 size-full pointer-events-none z-0">
                 <NoiseFilter className='mix-blend-hue'/>
                 <BgGoo
                     speed={0.3}

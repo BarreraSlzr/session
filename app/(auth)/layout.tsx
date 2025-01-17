@@ -13,7 +13,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           <Header />
           {children}
         </div>
-        <div className="absolute w-full h-full pointer-events-none z-0">
+        <div className="absolute size-full pointer-events-none z-0">
           <NoiseFilter className='mix-blend-hue' />
           <BgGoo
             speed={0.3}

@@ -11,7 +11,7 @@ export default function Navigation() {
           href={`/${item.toLowerCase().replace(/\s+/g, '-')}`}
           className="flex items-center gap-1 hover:opacity-70 transition-opacity"
         >
-          <ArrowUpRight className="h-4 w-4 rotate-45" />
+          <ArrowUpRight className="size-4 rotate-45" />
           {item}
         </Link>
       ))}
