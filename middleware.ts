@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { handleRedirect } from '@/app/(auth)/lib/redirect';
 import { validateSession } from '@/app/(auth)/lib/session';
+import { setCookie, clearCookie, getCookie } from '@/app/(auth)/lib/cookies';
 
 export const config = {
   matcher: ['/', '/600x600.jpg', '/api/:path*', '/login', '/register'],
@@ -9,20 +10,20 @@ export const config = {
 export async function middleware(req: NextRequest) {
   const redirectUrl = req.nextUrl.searchParams.get('redirect');
   if (redirectUrl) {
-    NextResponse.cookies.set('redirect', redirectUrl);
+    await setCookie('redirect', redirectUrl);
   }
 
-  const sessionToken = req.cookies.get('session')?.value;
+  const sessionToken = await getCookie('session');
   if (!sessionToken || !(await validateSession(sessionToken))) {
     if (!['/login', '/register', '/600x600.jpg'].includes(req.nextUrl.pathname)) {
       return NextResponse.redirect(new URL('/login', req.url));
     }
   } else {
-    const redirectUrlFromCookie = req.cookies.get('redirect')?.value;
+    const redirectUrlFromCookie = await getCookie('redirect');
     if (redirectUrlFromCookie) {
       const validatedUrl = handleRedirect(redirectUrlFromCookie, '/');
       const response = NextResponse.redirect(validatedUrl);
-      response.cookies.delete('redirect');
+      await clearCookie('redirect');
       return response;
     }
   }

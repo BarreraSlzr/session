@@ -3,9 +3,7 @@ import { getUser } from '@/app/(auth)/lib/db/queries';
 import { validateSession } from '@/app/(auth)/lib/session';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const sessionToken = req.cookies.session;
-
-  if (!sessionToken || !(await validateSession(sessionToken))) {
+  if (!(await validateSession())) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
