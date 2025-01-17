@@ -14,6 +14,9 @@ export function middleware(req: NextRequest) {
   const redirectUrl = req.nextUrl.searchParams.get('redirect');
   if (redirectUrl) {
     const validatedUrl = handleRedirect(redirectUrl, '/');
+    if (validatedUrl === req.url) {
+      return NextResponse.redirect(new URL('/', req.url));
+    }
     return NextResponse.redirect(validatedUrl);
   }
 

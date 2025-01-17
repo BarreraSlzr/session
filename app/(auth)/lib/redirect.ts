@@ -5,9 +5,19 @@
  * @returns {string} - The validated URL or the default URL.
  */
 export function handleRedirect(redirectUrl: string, defaultUrl: string): string {
+  const visitedUrls = new Set<string>();
+
+  function isCircularRedirect(url: string): boolean {
+    if (visitedUrls.has(url)) {
+      return true;
+    }
+    visitedUrls.add(url);
+    return false;
+  }
+
   try {
     const url = new URL(redirectUrl);
-    if (url.origin === window.location.origin) {
+    if (url.origin === window.location.origin && !isCircularRedirect(url.href)) {
       return url.href;
     }
   } catch (error) {
