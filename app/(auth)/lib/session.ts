@@ -12,19 +12,26 @@ export async function createSession(userId: string) {
   return session;
 }
 
-export async function validateSession(token: string) {
-  return await validateSessionDB(token);
+export async function validateSession(token?: string) {
+  const sessionToken = token || (await cookies()).get(sessionTokenConfig.name)?.value;
+  if (!sessionToken) {
+    throw new Error("Session token not found");
+  }
+  return await validateSessionDB(sessionToken);
 }
 
-export async function renewSession(token: string) {
-  const newSession = await renewSessionDB(token);
+export async function renewSession(token?: string) {
+  const sessionToken = token || (await cookies()).get(sessionTokenConfig.name)?.value;
+  if (!sessionToken) {
+    throw new Error("Session token not found");
+  }
+  const newSession = await renewSessionDB(sessionToken);
   await setSessionCookie(newSession.credential);
   return newSession;
 }
 
-export async function deleteSession() {
-  const cookieStore = await cookies();
-  const sessionToken = cookieStore.get(sessionTokenConfig.name)?.value;
+export async function deleteSession(token?: string) {
+  const sessionToken = token || (await cookies()).get(sessionTokenConfig.name)?.value;
   if (!sessionToken) {
     throw new Error("Session token not found");
   }
@@ -32,9 +39,8 @@ export async function deleteSession() {
   await clearSessionCookie();
 }
 
-export async function getUserIdFromSession() {
-  const cookieStore = await cookies();
-  const sessionToken = cookieStore.get(sessionTokenConfig.name)?.value;
+export async function getUserIdFromSession(token?: string) {
+  const sessionToken = token || (await cookies()).get(sessionTokenConfig.name)?.value;
   if (!sessionToken) {
     throw new Error("Session token not found");
   }
