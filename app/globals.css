@@ -145,7 +145,7 @@
 
 @layer base {
   body {
-    @apply bg-brand-blue-900 text-brand-blue-200 antialiased min-h-screen;
+    @apply bg-brand-blue-900 text-brand-blue-200 antialiased min-h-screen flex flex-col;
     label {
       @apply text-brand-blue-200;
     }
