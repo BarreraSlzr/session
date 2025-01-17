@@ -19,7 +19,7 @@ export async function initializeDatabase() {
       .defaultTo(sql.raw(`gen_random_uuid()`)))
     .addColumn('userId', 'uuid', (col) => col.notNull().references('user.id').onDelete('cascade'))
     .addColumn('type', 'varchar', (col) => col.notNull()
-      .check(sql.raw(`type in ('session' , 'mfa' , 'passkey' , 'password' , 'email' , 'reset-password')`)))
+      .check(sql.raw(`type in ('session' , 'mfa' , 'passkey' , 'update-password' , 'validate-email' , 'reset-password')`)))
     .addColumn('credential', 'text', (col) => col.notNull()
       .defaultTo(sql.raw(`gen_random_uuid()`))) // Generated or hashed
     .addColumn('verifiedAt', 'timestamptz')

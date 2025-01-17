@@ -9,7 +9,7 @@ export interface UserTable extends BaseTable {
   email: string;
 }
 
-export type TType = 'session' | 'mfa' | 'passkey' | 'password' | 'email' | 'reset-password'
+export type TType = 'session' | 'otp' | 'passkey' | 'set-password' | 'validate-email' | 'reset-password'
 export interface AuthMethodTable extends BaseTable {
   userId: string; // UUID
   type: TType; // Enum for auth methods

@@ -29,7 +29,7 @@ async function sendEmail({ email, subject, url }: { email: string; subject: stri
 
 // Send verification email to the user
 export async function sendVerificationEmail(email: string, userId: string) {
-  const token = await createAuthMethod(userId, 'email'); // Fetch the token (credential) from AuthMethod table
+  const token = await createAuthMethod(userId, 'validate-email'); // Fetch the token (credential) from AuthMethod table
   const verificationUrl = `https://account.internetfriends.xyz/verify-email?token=${token}`;
   await sendEmail({ email, subject: 'Verify your email address', url: verificationUrl });
 }

@@ -79,23 +79,17 @@ export async function deleteAuthMethodByToken(token: string, type: TType) {
 // Password Management
 export async function createPassword(userId: string, rawPassword: string) {
   const hashedPassword = await generateHashedPassword(rawPassword);
-  return createAuthMethod(userId, 'password', hashedPassword);
+  return createAuthMethod(userId, 'set-password', hashedPassword);
 }
 
 export async function updatePassword(userId: string, currentPassword: string, newPassword: string) {
-  const authMethod = await getAuthMethodByType(userId, 'password');
-
-  if (!authMethod) {
-    throw new Error("User does not have a password set.");
-  }
-
-  const isValid = await isPasswordValid(currentPassword, authMethod.credential);
+  const isValid = validatePassword(userId, currentPassword);
   if (!isValid) {
     throw new Error("Current password is incorrect.");
   }
 
   const hashedPassword = await generateHashedPassword(newPassword);
-  return updateAuthMethod(userId, 'password', hashedPassword);
+  return updateAuthMethod(userId, 'set-password', hashedPassword);
 }
 
 export async function resetPassword(token: string, newPassword: string) {
@@ -105,11 +99,11 @@ export async function resetPassword(token: string, newPassword: string) {
   }
 
   const hashedPassword = await generateHashedPassword(newPassword);
-  return updateAuthMethod(authMethod.userId, 'password', hashedPassword);
+  return updateAuthMethod(authMethod.userId, 'set-password', hashedPassword);
 }
 
-export async function verifyPassword(userId: string, rawPassword: string): Promise<boolean> {
-  const authMethod = await getAuthMethodByType(userId, 'password');
+export async function validatePassword(userId: string, rawPassword: string): Promise<boolean> {
+  const authMethod = await getAuthMethodByType(userId, 'set-password');
 
   if (!authMethod) return false;
 

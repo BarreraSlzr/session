@@ -1,7 +1,7 @@
 'use server'
 import { z } from "zod";
 import { createSession, deleteSession } from "./lib/session";
-import { createUser, getUser, createPassword, verifyPassword } from "@/app/(auth)/lib/db/queries";
+import { createUser, getUser, createPassword, validatePassword } from "@/app/(auth)/lib/db/queries";
 
 const authFormSchema = z.object({
   email: z.string().email(),
@@ -27,7 +27,7 @@ export const login = async (
       return { status: "failed" };
     }
 
-    const isPasswordValid = await verifyPassword(user.id, validatedData.password);
+    const isPasswordValid = await validatePassword(user.id, validatedData.password);
     if (!isPasswordValid) {
       return { status: "failed" };
     }

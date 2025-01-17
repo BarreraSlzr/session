@@ -12,7 +12,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const isValid = await verifyCredential('email', token);
+    const isValid = await verifyCredential('validate-email', token);
 
     if (!isValid) {
       return NextResponse.json(
