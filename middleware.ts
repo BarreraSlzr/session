@@ -4,7 +4,7 @@ import { validateSession } from '@/app/(auth)/lib/session';
 import { setCookie, clearCookie, getCookie } from '@/app/(auth)/lib/cookies';
 
 export const config = {
-  matcher: ['/', '/600x600.jpg', '/api/:path*', '/login', '/register'],
+  matcher: ['/', '/600x600.jpg', '/api/:path*', '/create', '/register'],
 };
 
 export async function middleware(req: NextRequest) {
@@ -15,8 +15,8 @@ export async function middleware(req: NextRequest) {
 
   const sessionToken = await getCookie('session');
   if (!sessionToken || !(await validateSession(sessionToken))) {
-    if (!['/login', '/register', '/600x600.jpg'].includes(req.nextUrl.pathname)) {
-      return NextResponse.redirect(new URL('/login', req.url));
+    if (!['/create', '/register', '/600x600.jpg'].includes(req.nextUrl.pathname)) {
+      return NextResponse.redirect(new URL('/create', req.url));
     }
   } else {
     const redirectUrlFromCookie = await getCookie('redirect');
