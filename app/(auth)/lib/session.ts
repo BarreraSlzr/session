@@ -1,4 +1,4 @@
-import { setCookie, clearCookie } from "@/app/(auth)/lib/cookies";
+import { setCookie, clearCookie, getCookie } from "@/app/(auth)/lib/cookies";
 import {
   validateSession as validateSessionDB,
   renewSession as renewSessionDB,
@@ -13,7 +13,7 @@ export async function createSession(userId: string) {
 }
 
 export async function validateSession(token?: string) {
-  const sessionToken = token || (await cookies()).get(sessionTokenConfig.name)?.value;
+  const sessionToken = token || await getCookie(sessionTokenConfig.name);
   if (!sessionToken) {
     throw new Error("Session token not found");
   }
@@ -21,7 +21,7 @@ export async function validateSession(token?: string) {
 }
 
 export async function renewSession(token?: string) {
-  const sessionToken = token || (await cookies()).get(sessionTokenConfig.name)?.value;
+  const sessionToken = token || await getCookie(sessionTokenConfig.name);
   if (!sessionToken) {
     throw new Error("Session token not found");
   }
@@ -31,7 +31,7 @@ export async function renewSession(token?: string) {
 }
 
 export async function deleteSession(token?: string) {
-  const sessionToken = token || (await cookies()).get(sessionTokenConfig.name)?.value;
+  const sessionToken = token || await getCookie(sessionTokenConfig.name);
   if (!sessionToken) {
     throw new Error("Session token not found");
   }
@@ -40,7 +40,7 @@ export async function deleteSession(token?: string) {
 }
 
 export async function getUserIdFromSession(token?: string) {
-  const sessionToken = token || (await cookies()).get(sessionTokenConfig.name)?.value;
+  const sessionToken = token || await getCookie(sessionTokenConfig.name);
   if (!sessionToken) {
     throw new Error("Session token not found");
   }
