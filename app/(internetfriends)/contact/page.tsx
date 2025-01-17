@@ -36,18 +36,18 @@ export default function Page() {
                     {contact.map((c, index) => (
                         <Link key={index} href={c.href} title={c.title}
                             className="flex items-center sm:gap-4 gap-2 hover:opacity-70 transition-opacity p-2 border-b-2 border-brand-blue-800 text-brand-blue-100">
-                            <span className="flex-grow">
+                            <span className="grow">
                                 {c.description}
                             </span>
                             <span className="flex flex-row items-center text-right">
                                 {c.title}
-                                <ArrowUpRight className="h-4 w-4 rotate" />
+                                <ArrowUpRight className="size-4 rotate" />
                             </span>
                         </Link>
                     ))}
                     <div
                         className="flex items-center sm:gap-4 gap-2 p-2 border-brand-blue-800 text-brand-blue-100">
-                        <div className="flex-grow flex flex-col sm:pb-6 pb-4 md:pb-8">
+                        <div className="grow flex flex-col sm:pb-6 pb-4 md:pb-8">
                             <p className="text-lg mb-2 max-w-2xl">Share Your Vision and Watch It Come to Life!</p>
                             <ContactForm />
                         </div>

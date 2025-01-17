@@ -8,7 +8,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import "../app/(internetfriends)/globals.css";
-import GoogleAnalytics from "@/app/(internetfriends)/components/google-analytics"
 
 
 const geistSans = Geist({

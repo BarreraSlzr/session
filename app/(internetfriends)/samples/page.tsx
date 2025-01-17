@@ -69,12 +69,12 @@ export default function Page() {
                             <span className="font-mono font-bold mb-auto">
                                 0{index + 1}
                             </span>
-                            <span className="flex-grow">
+                            <span className="grow">
                                 {p.description}
                             </span>
                             <span className="flex flex-row items-center text-right">
                                 {p.title}
-                                <ArrowUpRight className="h-4 w-4 rotate" />
+                                <ArrowUpRight className="size-4" />
                             </span>
                         </Link>
                     ))}

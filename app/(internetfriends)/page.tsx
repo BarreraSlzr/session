@@ -101,7 +101,7 @@ export default function Page() {
                     className="flex items-center gap-1 hover:opacity-70 transition-opacity"
                   >
                     {i.cta_word}
-                    <ArrowUpRight className="h-4 w-4" />
+                    <ArrowUpRight className="size-4" />
                   </div>
                 }
               />

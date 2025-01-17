@@ -52,9 +52,7 @@ export default function NotFoundPage() {
 
   return (
     <main>
-      {/* Header */}
       <Header/>
-
       <HeroText>
           <h1 className="text-4xl font-bold mb-4 font-mono">404 - {randomMessage.main}</h1>
           <p className="text-lg mb-6">{randomMessage.subtitle}</p>
@@ -62,14 +60,10 @@ export default function NotFoundPage() {
             href="/" 
             className="flex items-center gap-1 hover:opacity-70 transition-opacity">
               Go Home
-              <ArrowUpRight className="h-4 w-4" />
+              <ArrowUpRight className="size-4" />
           </Link>
       </HeroText>
-
-      {/* Main Navigation */}
       <Navigation/>
-
-      {/* Social Links */}
       <SocialLinks/>
       <CompanyInfo/>
     </main>
