@@ -76,9 +76,9 @@ export const register = async (
   }
 };
 
-export const logout = async (sessionToken: string): Promise<void> => {
+export const logout = async (): Promise<void> => {
   try {
-    await deleteSession(sessionToken);
+    await deleteSession();
   } catch (error) {
     console.error("Logout error:", error);
   }

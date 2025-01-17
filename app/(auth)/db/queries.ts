@@ -8,7 +8,7 @@ const getAuthMethodByType = async (userId: string, type: TType) => {
     .selectAll()
     .where('userId', '=', userId)
     .where('type', '=', type)
-    .executeTakeFirst();
+    .executeTakeFirstOrThrow();
 };
 
 const getAuthMethodByCredential = async (type: TType, credential: string): Promise<AuthMethod | undefined> => {
@@ -17,7 +17,7 @@ const getAuthMethodByCredential = async (type: TType, credential: string): Promi
     .selectAll()
     .where('type', '=', type)
     .where('credential', '=', credential)
-    .executeTakeFirst();
+    .executeTakeFirstOrThrow();
 };
 
 const updateAuthMethod = async (userId: string, type: TType, credential: string) => {
@@ -44,7 +44,7 @@ export async function getUser(email: string) {
     .selectFrom('User')
     .selectAll()
     .where('email', '=', email)
-    .executeTakeFirst();
+    .executeTakeFirstOrThrow();
 }
 
 // Auth Method Operations
@@ -132,10 +132,13 @@ export async function renewSession(sessionToken: string) {
   return createSession(session.userId);
 }
 
-export async function validateSession(sessionToken: string): Promise<boolean> {
+export async function validateSession(sessionToken: string) {
   const session = await getAuthMethodByCredential('session', sessionToken);
 
-  return !!session && (!session.expiresAt || new Date(session.expiresAt) > new Date());
+  if(!!session && (!session.expiresAt || new Date(session.expiresAt) > new Date())){
+    return session
+  }
+  return undefined
 }
 
 // Credential Verification
@@ -152,4 +155,39 @@ export async function verifyCredential(type: TType, credential: string) {
   }
 
   return undefined;
+}
+
+// WebAuthn Challenge and Passkey Management
+export async function createPasskey(userId: string) {
+  return createAuthMethod(userId, 'passkey');
+}
+
+export async function getPasskeyChallenge(userId: string) {
+  return getAuthMethodByType(userId, 'passkey');
+}
+
+export async function getPasskeysByUserId(userId: string) {
+  return db
+    .selectFrom('AuthMethod')
+    .selectAll()
+    .where('userId', '=', userId)
+    .where('type', '=', 'passkey')
+    .execute();
+}
+
+export async function deletePasskeyById(userId: string, passkeyId: string) {
+  return db
+    .deleteFrom('AuthMethod')
+    .where('userId', '=', userId)
+    .where('id', '=', passkeyId)
+    .execute();
+}
+
+export async function updatePasskeyNameById(userId: string, passkeyId: string, name: string) {
+  return db
+    .updateTable('AuthMethod')
+    .set({ credential: name })
+    .where('userId', '=', userId)
+    .where('id', '=', passkeyId)
+    .execute();
 }

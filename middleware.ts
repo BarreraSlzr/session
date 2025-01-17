@@ -1,9 +1,5 @@
-import NextAuth from 'next-auth';
 import { NextRequest, NextResponse } from 'next/server';
-import { authConfig } from '@/app/(auth)/auth.config';
 import { handleRedirect } from '@/app/(auth)/lib/redirect';
-
-export default NextAuth(authConfig).auth;
 
 export const config = {
   matcher: ['/', '/600x600.jpg', '/api/:path*', '/login', '/register'],
