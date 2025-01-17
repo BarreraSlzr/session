@@ -1,3 +1,5 @@
+"use client";
+
 import Link from 'next/link';
 import { Form } from '@/app/(auth)/components/auth-form';
 import { useRegister } from '@/app/(auth)/hooks/useRegister';
