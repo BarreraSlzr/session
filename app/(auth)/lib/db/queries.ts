@@ -22,7 +22,7 @@ const getAuthMethodByCredential = async (type: TType, credential: string): Promi
 
 export const getAuthMethodForReset = async (token: string): Promise<AuthMethod | undefined> => {
   const authMethod = await getAuthMethodByCredential('reset-password', token);
-  if (authMethod && authMethod.verifiedAt === null) {
+  if (authMethod && authMethod.verifiedAt === null && !isExpired(authMethod.expiresAt)) {
     return authMethod;
   }
   return undefined;
@@ -30,7 +30,7 @@ export const getAuthMethodForReset = async (token: string): Promise<AuthMethod |
 
 export const getAuthMethodForValidation = async (token: string): Promise<AuthMethod | undefined> => {
   const authMethod = await getAuthMethodByCredential('validate-email', token);
-  if (authMethod && authMethod.verifiedAt === null && !isTokenExpired(authMethod.expiresAt)) {
+  if (authMethod && authMethod.verifiedAt === null && !isExpired(authMethod.expiresAt)) {
     return authMethod;
   }
   return undefined;
@@ -44,12 +44,6 @@ const updateAuthMethod = async (userId: string, type: TType, credential: string)
     .where('type', '=', type)
     .returningAll()
     .executeTakeFirstOrThrow();
-};
-
-// Function to check if the token is expired
-export const isTokenExpired = (expiresAt: Date | undefined): boolean => {
-  if (!expiresAt) return false;
-  return new Date() > new Date(expiresAt);
 };
 
 // CRUD Operations for User
@@ -151,7 +145,7 @@ export async function renewSession(sessionToken: string) {
 export async function validateSession(sessionToken: string) {
   const session = await getAuthMethodByCredential('session', sessionToken);
 
-  if(!!session && (!session.expiresAt || new Date(session.expiresAt) > new Date())){
+  if(!!session && !isExpired(authMethod.expiresAt)){
     return session
   }
   return undefined
@@ -161,7 +155,7 @@ export async function validateSession(sessionToken: string) {
 export async function verifyCredential(type: TType, credential: string) {
   const authMethod = await getAuthMethodByCredential(type, credential);
 
-  if (authMethod && !isTokenExpired(authMethod.expiresAt)) {
+  if (authMethod) {
     await db
       .updateTable('auth_method')
       .set({ verifiedAt: sql`now()` })
@@ -206,4 +200,8 @@ export async function updatePasskeyNameById(userId: string, passkeyId: string, n
     .where('userId', '=', userId)
     .where('id', '=', passkeyId)
     .execute();
+}
+
+export function isExpired(date: Date | undefined): boolean {
+  return date !== null && new Date(date) < new Date();
 }

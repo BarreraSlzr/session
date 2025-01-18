@@ -2,11 +2,24 @@ import { NextRequest, NextResponse } from 'next/server';
 import { handleRedirect } from '@/app/(auth)/lib/redirect';
 import { validateSession } from '@/app/(auth)/lib/session';
 import { setCookie, clearCookie, getCookie } from '@/app/(auth)/lib/cookies';
-import { getAuthMethodForReset, getAuthMethodForValidation, verifyCredential, isTokenExpired } from './app/(auth)/lib/db/queries';
+import { getAuthMethodForReset, getAuthMethodForValidation, verifyCredential, isExpired } from './app/(auth)/lib/db/queries';
 
 export const config = {
   matcher: ['/', '/600x600.jpg', '/api/:path*', '/create', '/register', '/update', '/reset', '/validate'],
 };
+
+async function handleAuthMethodValidation(authMethod) {
+  if (!authMethod) {
+    throw new Error('Invalid token');
+  }
+  if (isExpired(authMethod.expiresAt)) {
+    throw new Error('Token expired');
+  }
+  if (authMethod.verifiedAt) {
+    throw new Error('Token already verified');
+  }
+  await verifyCredential(authMethod.type, authMethod.credential);
+}
 
 export async function middleware(req: NextRequest) {
   const redirectUrl = req.nextUrl.searchParams.get('redirect');
@@ -21,15 +34,7 @@ export async function middleware(req: NextRequest) {
         const authMethod = req.nextUrl.pathname === '/reset' 
           ? await getAuthMethodForReset(token) 
           : await getAuthMethodForValidation(token);
-        if (!authMethod) {
-          throw new Error('Invalid token');
-        }
-        if (isTokenExpired(authMethod.expiresAt)) {
-          return NextResponse.redirect(new URL(`/token-error?title=${encodeURIComponent('Token Error')}&message=${encodeURIComponent('The token has expired.')}`, req.url));
-        }
-        if (req.nextUrl.pathname === '/validate' && !authMethod.verifiedAt) {
-          await verifyCredential('validate-email', token);
-        }
+        await handleAuthMethodValidation(authMethod);
       } else {
         throw new Error('Token is required');
       }
@@ -44,8 +49,17 @@ export async function middleware(req: NextRequest) {
     }
     return NextResponse.next();
   } catch (error) {
-    if (!['/create', '/register', '/600x600.jpg'].includes(req.nextUrl.pathname)) {
-      return NextResponse.redirect(new URL('/create', req.url));
+    const errorUrl = new URL('/token-error', req.url);
+    if (error.message === 'Token expired') {
+      errorUrl.searchParams.set('title', 'Token Error');
+      errorUrl.searchParams.set('message', 'Your token has expired.');
+    } else if (error.message === 'Token already verified') {
+      errorUrl.searchParams.set('title', 'Token Error');
+      errorUrl.searchParams.set('message', 'Your token has already been verified.');
+    } else {
+      errorUrl.searchParams.set('title', 'Token Error');
+      errorUrl.searchParams.set('message', 'Invalid token.');
     }
+    return NextResponse.redirect(errorUrl);
   }
 }
