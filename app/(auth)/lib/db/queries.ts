@@ -20,6 +20,22 @@ const getAuthMethodByCredential = async (type: TType, credential: string): Promi
     .executeTakeFirstOrThrow();
 };
 
+export const getAuthMethodForReset = async (token: string): Promise<AuthMethod | undefined> => {
+  const authMethod = await getAuthMethodByCredential('reset-password', token);
+  if (authMethod && authMethod.verifiedAt === null) {
+    return authMethod;
+  }
+  return undefined;
+};
+
+export const getAuthMethodForValidation = async (token: string): Promise<AuthMethod | undefined> => {
+  const authMethod = await getAuthMethodByCredential('validate-email', token);
+  if (authMethod && authMethod.verifiedAt === null) {
+    return authMethod;
+  }
+  return undefined;
+};
+
 const updateAuthMethod = async (userId: string, type: TType, credential: string) => {
   return db
     .updateTable('auth_method')
