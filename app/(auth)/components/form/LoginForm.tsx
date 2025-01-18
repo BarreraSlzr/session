@@ -1,6 +1,6 @@
 "use client";
 
-import { Form } from "@/app/(auth)/components/auth-form";
+import { Form } from "@/app/(auth)/components/form";
 import { useLogin } from "@/app/(auth)/hooks/useLogin";
 import { usePasskey } from "@/app/(auth)/hooks/usePasskey";
 import { Input } from "@/components/ui/input";

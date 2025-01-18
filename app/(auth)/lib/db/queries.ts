@@ -22,7 +22,7 @@ const getAuthMethodByCredential = async (type: TType, credential: string): Promi
 
 export const getAuthMethodForReset = async (token: string): Promise<AuthMethod | undefined> => {
   const authMethod = await getAuthMethodByCredential('reset-password', token);
-  if (authMethod && authMethod.verifiedAt === null) {
+  if (authMethod && authMethod.verifiedAt === null && !isExpired(authMethod.expiresAt)) {
     return authMethod;
   }
   return undefined;
@@ -30,7 +30,7 @@ export const getAuthMethodForReset = async (token: string): Promise<AuthMethod |
 
 export const getAuthMethodForValidation = async (token: string): Promise<AuthMethod | undefined> => {
   const authMethod = await getAuthMethodByCredential('validate-email', token);
-  if (authMethod && authMethod.verifiedAt === null) {
+  if (authMethod && authMethod.verifiedAt === null && !isExpired(authMethod.expiresAt)) {
     return authMethod;
   }
   return undefined;
@@ -145,7 +145,7 @@ export async function renewSession(sessionToken: string) {
 export async function validateSession(sessionToken: string) {
   const session = await getAuthMethodByCredential('session', sessionToken);
 
-  if(!!session && (!session.expiresAt || new Date(session.expiresAt) > new Date())){
+  if(!!session && !isExpired(session.expiresAt)){
     return session
   }
   return undefined
@@ -200,4 +200,8 @@ export async function updatePasskeyNameById(userId: string, passkeyId: string, n
     .where('userId', '=', userId)
     .where('id', '=', passkeyId)
     .execute();
+}
+
+export function isExpired(date: Date | undefined): boolean {
+  return !!date && new Date(date) < new Date();
 }
