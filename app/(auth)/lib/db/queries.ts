@@ -145,7 +145,7 @@ export async function renewSession(sessionToken: string) {
 export async function validateSession(sessionToken: string) {
   const session = await getAuthMethodByCredential('session', sessionToken);
 
-  if(!!session && !isExpired(authMethod.expiresAt)){
+  if(!!session && !isExpired(session.expiresAt)){
     return session
   }
   return undefined
@@ -203,5 +203,5 @@ export async function updatePasskeyNameById(userId: string, passkeyId: string, n
 }
 
 export function isExpired(date: Date | undefined): boolean {
-  return date !== null && new Date(date) < new Date();
+  return !!date && new Date(date) < new Date();
 }
