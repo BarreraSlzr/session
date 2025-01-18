@@ -9,7 +9,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
   return (
     <main className='flex flex-col grow'>
       <div className="relative grow flex items-start md:items-center justify-center bg-background">
-        <div className="w-full max-w-md overflow-hidden rounded-lg gap-12 flex flex-col bg-background mt-12 md:-mt-12 p-2 pb-12 z-10">
+        <div className="w-full max-w-md overflow-hidden rounded-lg gap-12 flex flex-col bg-background m-2 mt-12 md:-mt-12 pb-12 z-10">
           <Header />
           {children}
         </div>
