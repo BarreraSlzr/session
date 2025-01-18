@@ -1,4 +1,4 @@
-import { UpdateForm } from '@/components/form/UpdateForm';
+import { UpdateForm } from '@/app/(auth)/components/form/UpdateForm';
 
 export default function Page() {
   return (

@@ -1,4 +1,4 @@
-import { ResetForm } from '@/components/form/ResetForm';
+import { ResetForm } from '@/app/(auth)/components/form/ResetForm';
 
 // Token validation is handled in the middleware
 export default function Page() {
