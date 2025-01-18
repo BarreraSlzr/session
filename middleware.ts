@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { handleRedirect } from '@/app/(auth)/lib/redirect';
 import { validateSession } from '@/app/(auth)/lib/session';
 import { setCookie, clearCookie, getCookie } from '@/app/(auth)/lib/cookies';
-import { getAuthMethodByCredential } from '@/app/(auth)/lib/db/queries';
+import { getAuthMethodForReset, getAuthMethodForValidation } from './app/(auth)/lib/db/queries';
 
 export const config = {
   matcher: ['/', '/600x600.jpg', '/api/:path*', '/create', '/register', '/update', '/reset', '/validate'],
@@ -15,10 +15,12 @@ export async function middleware(req: NextRequest) {
   }
 
   try {
-    if (['/reset', '/validate'].includes(req.nextUrl.pathname)) {
+    if (req.nextUrl.pathname === '/reset' || req.nextUrl.pathname === '/validate') {
       const token = req.nextUrl.searchParams.get('token');
       if (token) {
-        const authMethod = await getAuthMethodByCredential(req.nextUrl.pathname === '/reset' ? 'reset-password' : 'validate-email', token);
+        const authMethod = req.nextUrl.pathname === '/reset' 
+          ? await getAuthMethodForReset(token) 
+          : await getAuthMethodForValidation(token);
         if (!authMethod) {
           throw new Error('Invalid token');
         }

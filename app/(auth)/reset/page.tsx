@@ -31,26 +31,26 @@ export default function Page() {
 
   return (
     <>
-    <div className= "flex flex-col items-center justify-center gap-2 px-4 text-center sm:px-16" >
-    <h3 className="text-xl font-semibold dark:text-zinc-50" > Reset Password < /h3>
-      < p className = "text-sm text-gray-500 dark:text-zinc-400" >
-        { token? 'Enter your new password': 'No token found. Please check your email for the reset link.' }
+      <div className="flex flex-col items-center justify-center gap-2 px-4 text-center sm:px-16">
+        <h3 className="text-xl font-semibold dark:text-zinc-50">Reset Password</h3>
+        <p className="text-sm text-gray-500 dark:text-zinc-400">
+          {token ? 'Enter your new password' : 'No token found. Please check your email for the reset link.'}
         </p>
-        </div>
-  { resetState.status === 'success' && (
-      <p className= "text-center text-green-500" > Password reset successfully! < /p>
-      )
-    ({ token && (
-        <Form onSubmit= { onSubmit } >
-      <div>
-      <Label htmlFor="newPassword" > New Password < /Label>
-        < Input id = "newPassword" name = "newPassword" type = "password" required />
+      </div>
+      {resetState.status === 'success' && (
+        <p className="text-center text-green-500">Password reset successfully!</p>
+      )}
+      {token && (
+        <Form onSubmit={onSubmit}>
+          <div>
+            <Label htmlFor="password">New Password</Label>
+            <Input id="password" name="password" type="password" required />
           </div>
-          < SubmitButton id = "reset" isLoading = { resetState.status === 'in_progress' } >
+          <SubmitButton id="reset" isLoading={resetState.status === 'in_progress'}>
             Reset Password
-              < /SubmitButton>
-              < /Form>
-          )})}
-</>
+          </SubmitButton>
+        </Form>
+      )}
+    </>
   );
 }
