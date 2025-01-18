@@ -30,7 +30,7 @@ export const getAuthMethodForReset = async (token: string): Promise<AuthMethod |
 
 export const getAuthMethodForValidation = async (token: string): Promise<AuthMethod | undefined> => {
   const authMethod = await getAuthMethodByCredential('validate-email', token);
-  if (authMethod && authMethod.verifiedAt === null) {
+  if (authMethod && authMethod.verifiedAt === null && !isTokenExpired(authMethod.expiresAt)) {
     return authMethod;
   }
   return undefined;
@@ -44,6 +44,12 @@ const updateAuthMethod = async (userId: string, type: TType, credential: string)
     .where('type', '=', type)
     .returningAll()
     .executeTakeFirstOrThrow();
+};
+
+// Function to check if the token is expired
+export const isTokenExpired = (expiresAt: Date | undefined): boolean => {
+  if (!expiresAt) return false;
+  return new Date() > new Date(expiresAt);
 };
 
 // CRUD Operations for User
@@ -155,7 +161,7 @@ export async function validateSession(sessionToken: string) {
 export async function verifyCredential(type: TType, credential: string) {
   const authMethod = await getAuthMethodByCredential(type, credential);
 
-  if (authMethod) {
+  if (authMethod && !isTokenExpired(authMethod.expiresAt)) {
     await db
       .updateTable('auth_method')
       .set({ verifiedAt: sql`now()` })

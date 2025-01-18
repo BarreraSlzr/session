@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { handleRedirect } from '@/app/(auth)/lib/redirect';
 import { validateSession } from '@/app/(auth)/lib/session';
 import { setCookie, clearCookie, getCookie } from '@/app/(auth)/lib/cookies';
-import { getAuthMethodForReset, getAuthMethodForValidation } from './app/(auth)/lib/db/queries';
+import { getAuthMethodForReset, getAuthMethodForValidation, verifyCredential, isTokenExpired } from './app/(auth)/lib/db/queries';
 
 export const config = {
   matcher: ['/', '/600x600.jpg', '/api/:path*', '/create', '/register', '/update', '/reset', '/validate'],
@@ -23,6 +23,12 @@ export async function middleware(req: NextRequest) {
           : await getAuthMethodForValidation(token);
         if (!authMethod) {
           throw new Error('Invalid token');
+        }
+        if (isTokenExpired(authMethod.expiresAt)) {
+          return NextResponse.redirect(new URL(`/token-error?title=${encodeURIComponent('Token Error')}&message=${encodeURIComponent('The token has expired.')}`, req.url));
+        }
+        if (req.nextUrl.pathname === '/validate' && !authMethod.verifiedAt) {
+          await verifyCredential('validate-email', token);
         }
       } else {
         throw new Error('Token is required');
