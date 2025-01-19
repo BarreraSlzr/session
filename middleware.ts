@@ -2,33 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { handleRedirect } from '@/app/(auth)/lib/redirect';
 import { validateSession } from '@/app/(auth)/lib/session';
 import { setCookie, clearCookie, getCookie } from '@/app/(auth)/lib/cookies';
-import { getAuthMethodForReset, getAuthMethodForValidation, verifyCredential, isExpired } from './app/(auth)/lib/db/queries';
-import { AuthMethod } from './app/(auth)/lib/db/types';
+import { getAuthMethodForReset, getAuthMethodForValidation } from './app/(auth)/lib/db/queries';
+import { handleAuthMethodValidation, errorMessages } from "@/app/(auth)/lib/token";
 
 export const config = {
   matcher: ['/', '/600x600.jpg', '/api/:path*', '/create', '/register', '/update', '/reset', '/validate'],
 };
-
-const errorMessages = {
-  'Token expired': 'Your token has expired.',
-  'Token already verified': 'Your token has already been verified.',
-  'Token error': 'Invalid token.',
-  'Token is required': 'Token is required.'
-};
-
-async function handleAuthMethodValidation(authMethod: AuthMethod | undefined) {
-  if (!authMethod) {
-    throw new Error('Token error');
-  }
-  if (isExpired(authMethod.expiresAt)) {
-    throw new Error('Token expired');
-  }
-  if (authMethod.verifiedAt) {
-    throw new Error('Token already verified');
-  }
-  await verifyCredential(authMethod.type, authMethod.credential);
-}
-
 
 function handleError(error: Error, req: NextRequest) {
   const errorMessage = error.message as keyof typeof errorMessages;
@@ -53,15 +32,17 @@ export async function middleware(req: NextRequest) {
   }
 
   try {
-    if (req.nextUrl.pathname === '/reset' || req.nextUrl.pathname === '/validate') {
+    if (req.nextUrl.pathname === '/reset' || req.nextUrl.pathname === '/validate' || req.nextUrl.pathname === '/update') {
       const token = req.nextUrl.searchParams.get('token');
       if (!token) {
         throw new Error('Token is required');
       }
-      const authMethod = req.nextUrl.pathname === '/reset' 
+      const authMethod = await handleAuthMethodValidation(
+        req.nextUrl.pathname === '/reset' 
         ? await getAuthMethodForReset(token)
-        : await getAuthMethodForValidation(token);
-      await handleAuthMethodValidation(authMethod);
+        : await getAuthMethodForValidation(token)
+      );
+      await setCookie('token', authMethod.credential);
     } else if (await validateSession()) {
       const redirectUrlFromCookie = await getCookie('redirect');
       if (redirectUrlFromCookie) {

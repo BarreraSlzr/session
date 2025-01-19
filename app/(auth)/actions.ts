@@ -1,7 +1,9 @@
 'use server'
 import { z } from "zod";
-import { createSession, deleteSession } from "./lib/session";
-import { createUser, getUser, createPassword, validatePassword } from "@/app/(auth)/lib/db/queries";
+import { createSession } from "./lib/session";
+import { createUser, getUser, createPassword, validatePassword, updatePassword, resetPassword, verifyCredential, getAuthMethodForReset, getAuthMethodForValidation, getAuthMethodForUpdate } from "@/app/(auth)/lib/db/queries";
+import { getCookie } from "@/app/(auth)/lib/cookies";
+import { handleAuthMethodValidation, errorMessages } from "@/app/(auth)/lib/token";
 
 const authFormSchema = z.object({
   email: z.string().email(),
@@ -72,6 +74,37 @@ export const register = async (
       return { status: "invalid_data" };
     }
     console.error("Registration error:", error);
+    return { status: "failed" };
+  }
+};
+
+export interface PasswordChangeStatus {
+  status: "success" | "failed" | "invalid_data";
+}
+
+export const handlePasswordChange = async (formData: FormData): Promise<PasswordChangeStatus> => {
+  try {
+    const token = await getCookie('token') as string;
+    const newPassword = formData.get("newPassword") as string;
+    const currentPassword = formData.get("currentPassword") as string;
+    const authMethod = 
+    await handleAuthMethodValidation(
+      currentPassword
+          ? await getAuthMethodForReset(token)
+          : await getAuthMethodForUpdate(token)
+    )
+
+    if (currentPassword) {
+      await verifyCredential('set-password', token as string);
+      await updatePassword(authMethod.userId, currentPassword, newPassword);
+    } else {
+      await verifyCredential('reset-password', token as string)
+      await resetPassword(token as string, newPassword);
+    }
+
+    return { status: "success" };
+  } catch (error) {
+    console.error("Password change error:", error);
     return { status: "failed" };
   }
 };

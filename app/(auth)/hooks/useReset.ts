@@ -1,35 +1,26 @@
 "use client"
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { handlePasswordChange } from '@/app/(auth)/actions';
 
 export function useReset() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [resetState, setResetState] = useState({ status: 'idle' });
 
   const resetAction = async (formData: FormData) => {
+    const token = searchParams.get("token");
+    if (token) {
+      formData.append("token", token);
+    }
     setResetState({ status: 'in_progress' });
-    try {
-      const response = await fetch('/api/auth/reset-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          token: formData.get('token'),
-          newPassword: formData.get('newPassword'),
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to reset password');
-      }
-
-      setResetState({ status: 'success' });
+    const { status } = await handlePasswordChange(formData);
+      setResetState({ status });
+    if (status === 'success') {
       toast.success('Password reset successfully');
       router.refresh();
-    } catch (error) {
-      setResetState({ status: 'failed' });
+    } else {
       toast.error('Failed to reset password');
     }
   };

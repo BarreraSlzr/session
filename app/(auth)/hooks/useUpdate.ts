@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
+import { handlePasswordChange } from '@/app/(auth)/actions';
 
 export function useUpdate() {
   const router = useRouter();
@@ -9,26 +10,12 @@ export function useUpdate() {
 
   const updateAction = async (formData: FormData) => {
     setUpdateState({ status: 'in_progress' });
-    try {
-      const response = await fetch('/api/auth/update-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          currentPassword: formData.get('currentPassword'),
-          newPassword: formData.get('newPassword'),
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to update password');
-      }
-
+    const status = await handlePasswordChange(formData);
+    if (status.status === 'success') {
       setUpdateState({ status: 'success' });
       toast.success('Password updated successfully');
       router.refresh();
-    } catch (error) {
+    } else {
       setUpdateState({ status: 'failed' });
       toast.error('Failed to update password');
     }

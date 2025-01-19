@@ -24,8 +24,8 @@ export function ResetForm() {
   return (
     <Form onSubmit={onSubmit}>
       <div>
-        <Label htmlFor="password">New Password</Label>
-        <Input id="password" name="password" type="password" required />
+        <Label htmlFor="newPassword">New Password</Label>
+        <Input id="newPassword" name="newPassword" type="password" required />
       </div>
       <SubmitButton id="reset" isLoading={resetState.status === "in_progress"}>
         Reset Password
