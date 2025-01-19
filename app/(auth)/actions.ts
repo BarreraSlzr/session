@@ -75,11 +75,3 @@ export const register = async (
     return { status: "failed" };
   }
 };
-
-export const logout = async (): Promise<void> => {
-  try {
-    await deleteSession();
-  } catch (error) {
-    console.error("Logout error:", error);
-  }
-};
