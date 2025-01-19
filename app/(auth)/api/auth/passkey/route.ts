@@ -4,7 +4,7 @@ import {
   generateAuthenticationOptions,
   verifyRegistrationResponse,
   verifyAuthenticationResponse,
-} from "@/app/(auth)/lib/webauthn";
+} from "@/app/(auth)/lib/passkey";
 import {
   createPasskey,
   getPasskeysByUserId,

@@ -1,4 +1,3 @@
-import { isExpired } from "./db/queries";
 import { AuthMethod } from "./db/types";
 
 export const errorMessages = {
@@ -19,4 +18,9 @@ export async function handleAuthMethodValidation(authMethod: AuthMethod | undefi
         throw new Error('Token already verified');
     }
     return authMethod as AuthMethod;
+}
+
+
+export function isExpired(date: Date | undefined): boolean {
+    return !!date && new Date(date) < new Date();
 }

@@ -1,6 +1,7 @@
 import { db, sql } from ".";
 import { generateHashedPassword, isPasswordValid } from "@/app/(auth)/lib/password";
 import { AuthMethod, TType } from "@/app/(auth)/lib/db/types";
+import { isExpired } from "../token";
 
 const getAuthMethodByType = async (userId: string, type: TType) => {
   return db
@@ -198,6 +199,3 @@ export async function updatePasskeyNameById(userId: string, passkeyId: string, n
     .execute();
 }
 
-export function isExpired(date: Date | undefined): boolean {
-  return !!date && new Date(date) < new Date();
-}
