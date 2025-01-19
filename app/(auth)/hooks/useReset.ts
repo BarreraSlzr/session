@@ -15,13 +15,12 @@ export function useReset() {
       formData.append("token", token);
     }
     setResetState({ status: 'in_progress' });
-    try {
-      await handlePasswordChange(formData);
-      setResetState({ status: 'success' });
+    const { status } = await handlePasswordChange(formData);
+      setResetState({ status });
+    if (status === 'success') {
       toast.success('Password reset successfully');
       router.refresh();
-    } catch (error) {
-      setResetState({ status: 'failed' });
+    } else {
       toast.error('Failed to reset password');
     }
   };
