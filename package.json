@@ -10,6 +10,9 @@
     "lint:fix": "next lint --fix && biome lint --write --unsafe",
     "format": "biome format --write"
   },
+  "engines": {
+      "pnpm": ">=3"
+  },
   "dependencies": {
     "@ai-sdk/openai": "1.0.6",
     "@codemirror/lang-javascript": "^6.2.2",

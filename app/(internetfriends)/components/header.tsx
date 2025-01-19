@@ -36,7 +36,7 @@ export default function Header() {
                 </div>
             </Link>
 
-            <Link href="/samples" className="flex items-center gap-1 hover:opacity-70 transition-opacity">
+            <Link href="https://www.internetfriends.xyz/samples" className="flex items-center gap-1 hover:opacity-70 transition-opacity">
                 {content.headerLink}
                 <ArrowUpRight className="size-4" />
             </Link>
