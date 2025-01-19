@@ -1,7 +1,7 @@
 'use server'
 import { z } from "zod";
 import { createSession, deleteSession } from "./lib/session";
-import { createUser, getUser, createPassword, validatePassword } from "@/app/(auth)/lib/db/queries";
+import { createUser, getUser, createPassword, validatePassword, updatePassword, resetPassword } from "@/app/(auth)/lib/db/queries";
 
 const authFormSchema = z.object({
   email: z.string().email(),
@@ -73,5 +73,18 @@ export const register = async (
     }
     console.error("Registration error:", error);
     return { status: "failed" };
+  }
+};
+
+export const handlePasswordChange = async (formData: FormData): Promise<void> => {
+  const token = formData.get("token");
+  const newPassword = formData.get("newPassword") as string;
+
+  if (token) {
+    await resetPassword(token as string, newPassword);
+  } else {
+    const userId = formData.get("userId") as string;
+    const currentPassword = formData.get("currentPassword") as string;
+    await updatePassword(userId, currentPassword, newPassword);
   }
 };
