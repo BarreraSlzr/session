@@ -1,7 +1,9 @@
 'use server'
 import { z } from "zod";
-import { createSession, deleteSession } from "./lib/session";
-import { createUser, getUser, createPassword, validatePassword, updatePassword, resetPassword } from "@/app/(auth)/lib/db/queries";
+import { createSession } from "./lib/session";
+import { createUser, getUser, createPassword, validatePassword, updatePassword, resetPassword, verifyCredential, getAuthMethodForReset, getAuthMethodForValidation, getAuthMethodForUpdate } from "@/app/(auth)/lib/db/queries";
+import { getCookie } from "@/app/(auth)/lib/cookies";
+import { handleAuthMethodValidation, errorMessages } from "@/app/(auth)/lib/token";
 
 const authFormSchema = z.object({
   email: z.string().email(),
@@ -77,14 +79,21 @@ export const register = async (
 };
 
 export const handlePasswordChange = async (formData: FormData): Promise<void> => {
-  const token = formData.get("token");
+  const token = await getCookie('token') as string;
   const newPassword = formData.get("newPassword") as string;
+  const currentPassword = formData.get("currentPassword") as string;
+  const authMethod = 
+  await handleAuthMethodValidation(
+    currentPassword
+        ? await getAuthMethodForReset(token)
+        : await getAuthMethodForUpdate(token)
+  )
 
-  if (token) {
-    await resetPassword(token as string, newPassword);
+  if (currentPassword) {
+    await verifyCredential('set-password', token as string);
+    await updatePassword(authMethod.userId, currentPassword, newPassword);
   } else {
-    const userId = formData.get("userId") as string;
-    const currentPassword = formData.get("currentPassword") as string;
-    await updatePassword(userId, currentPassword, newPassword);
+    await verifyCredential('reset-password', token as string)
+    await resetPassword(token as string, newPassword);
   }
 };
