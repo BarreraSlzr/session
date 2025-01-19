@@ -78,22 +78,33 @@ export const register = async (
   }
 };
 
-export const handlePasswordChange = async (formData: FormData): Promise<void> => {
-  const token = await getCookie('token') as string;
-  const newPassword = formData.get("newPassword") as string;
-  const currentPassword = formData.get("currentPassword") as string;
-  const authMethod = 
-  await handleAuthMethodValidation(
-    currentPassword
-        ? await getAuthMethodForReset(token)
-        : await getAuthMethodForUpdate(token)
-  )
+export interface PasswordChangeStatus {
+  status: "success" | "failed" | "invalid_data";
+}
 
-  if (currentPassword) {
-    await verifyCredential('set-password', token as string);
-    await updatePassword(authMethod.userId, currentPassword, newPassword);
-  } else {
-    await verifyCredential('reset-password', token as string)
-    await resetPassword(token as string, newPassword);
+export const handlePasswordChange = async (formData: FormData): Promise<PasswordChangeStatus> => {
+  try {
+    const token = await getCookie('token') as string;
+    const newPassword = formData.get("newPassword") as string;
+    const currentPassword = formData.get("currentPassword") as string;
+    const authMethod = 
+    await handleAuthMethodValidation(
+      currentPassword
+          ? await getAuthMethodForReset(token)
+          : await getAuthMethodForUpdate(token)
+    )
+
+    if (currentPassword) {
+      await verifyCredential('set-password', token as string);
+      await updatePassword(authMethod.userId, currentPassword, newPassword);
+    } else {
+      await verifyCredential('reset-password', token as string)
+      await resetPassword(token as string, newPassword);
+    }
+
+    return { status: "success" };
+  } catch (error) {
+    console.error("Password change error:", error);
+    return { status: "failed" };
   }
 };

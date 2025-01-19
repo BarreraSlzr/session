@@ -10,12 +10,12 @@ export function useUpdate() {
 
   const updateAction = async (formData: FormData) => {
     setUpdateState({ status: 'in_progress' });
-    try {
-      await handlePasswordChange(formData);
+    const status = await handlePasswordChange(formData);
+    if (status.status === 'success') {
       setUpdateState({ status: 'success' });
       toast.success('Password updated successfully');
       router.refresh();
-    } catch (error) {
+    } else {
       setUpdateState({ status: 'failed' });
       toast.error('Failed to update password');
     }
