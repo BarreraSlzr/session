@@ -4,6 +4,7 @@ import { createSession, getUserIdFromSession } from "./lib/session";
 import { createUser, getUser, createPassword, validatePassword, updatePassword, resetPassword, verifyCredential, getAuthMethodForReset, getAuthMethodForValidation, getAuthMethodForUpdate, getPasskeyChallenge, verifyAuthenticationResponse } from "@/app/(auth)/lib/db/queries";
 import { getCookie } from "@/app/(auth)/lib/cookies";
 import { handleAuthMethodValidation, errorMessages } from "@/app/(auth)/lib/token";
+import { generateRegistrationOptions, verifyRegistrationResponse } from "@/app/(auth)/lib/passkey";
 
 const authFormSchema = z.object({
   email: z.string().email(),
@@ -127,6 +128,24 @@ export const handlePasskeyAuth = async (formData: FormData): Promise<Status> => 
     return { status: "failed" };
   } catch (error) {
     console.error("Passkey authentication error:", error);
+    return { status: "failed" };
+  }
+};
+
+export const handlePasskeyRegistration = async (formData: FormData): Promise<Status> => {
+  try {
+    const userId = await getUserIdFromSession();
+    const options = generateRegistrationOptions(userId, formData.get("email") as string);
+    const verification = await verifyRegistrationResponse({
+      ...formData
+    }, options.challenge);
+    if (verification.verified) {
+      await createSession(userId);
+      return { status: "success" };
+    }
+    return { status: "failed" };
+  } catch (error) {
+    console.error("Passkey registration error:", error);
     return { status: "failed" };
   }
 };

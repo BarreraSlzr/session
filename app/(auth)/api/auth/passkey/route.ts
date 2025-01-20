@@ -13,7 +13,7 @@ import {
   getPasskeyChallenge,
   getUser,
 } from "@/app/(auth)/lib/db/queries";
-import { getUserIdFromSession } from "@/app/(auth)/lib/session";
+import { getUserIdFromSession, createSession } from "@/app/(auth)/lib/session";
 
 export async function GET(req: Request) {
   const { pathname } = new URL(req.url);
@@ -52,6 +52,7 @@ export async function POST(req: Request) {
     }, passkey.credential);
     if (verification.verified) {
       await updatePasskeyNameById(userId, body.credentialID, body.name);
+      await createSession(userId); // Grant access to the user
       return NextResponse.json({ success: true });
     }
     return NextResponse.json({ error: "Verification failed" }, { status: 400 });
@@ -63,6 +64,7 @@ export async function POST(req: Request) {
       ...body
     }, passkey);
     if (verification.verified) {
+      await createSession(userId); // Grant access to the user
       return NextResponse.json({ success: true });
     }
     return NextResponse.json({ error: "Verification failed" }, { status: 400 });
