@@ -82,6 +82,16 @@ await renewSession(sessionToken);
 const isValid = await validateSession(sessionToken);
 ```
 
+### Generation of UUIDs as Credentials (Tokens)
+
+UUIDs are generated as credentials (tokens) for each authentication method in the `createAuthMethod` function in `app/(auth)/lib/db/queries.ts`. If no credential is provided, a UUID is generated.
+
+The following functions use `createAuthMethod` to generate tokens:
+- `createSession` in `app/(auth)/lib/db/queries.ts` generates a session token.
+- `resetPassword` in `app/(auth)/lib/db/queries.ts` generates a reset password token.
+- `sendVerificationEmail` in `app/(auth)/lib/email.ts` generates a verification token.
+- `sendResetPasswordEmail` in `app/(auth)/lib/email.ts` generates a reset password token.
+
 ## User Authentication Flows
 
 ### Registration Flow
