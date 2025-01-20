@@ -1,10 +1,14 @@
 import { generateAuthenticationOptions } from "@simplewebauthn/server";
 import { getUserIdFromSession, getUser } from "@/app/(auth)/lib/session";
+import { createPasskey } from "@/app/(auth)/lib/db/queries";
 
 export async function GET(req: Request) {
   try {
     const userId = await getUserIdFromSession();
     const user = await getUser(userId);
+
+    // Create a passkey for the user
+    const passkey = await createPasskey(userId);
 
     const options = generateAuthenticationOptions({
       rpID: "your-app-id",
@@ -12,7 +16,7 @@ export async function GET(req: Request) {
       timeout: 60000,
       allowCredentials: [
         {
-          id: userId,
+          id: passkey.credential,
           type: "public-key",
           transports: ["usb", "ble", "nfc"],
         },
