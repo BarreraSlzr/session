@@ -14,6 +14,8 @@ import {
   getUser,
 } from "@/app/(auth)/lib/db/queries";
 import { getUserIdFromSession } from "@/app/(auth)/lib/session";
+import { handleAuthMethodValidation } from "@/app/(auth)/lib/token";
+import { setCookie, getCookie } from "@/app/(auth)/lib/cookies";
 
 export async function GET(req: Request) {
   const { pathname } = new URL(req.url);
