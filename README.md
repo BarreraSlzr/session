@@ -176,3 +176,23 @@ sequenceDiagram
     Server->>Client: Return success
     Client->>User: Allow access
 ```
+
+### Passkey User Authentication Flow
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Client
+    participant Server
+    User->>Client: Request passkey authentication
+    Client->>Server: Generate authentication options
+    Server->>Client: Return authentication options
+    Client->>User: Start authentication
+    User->>Client: Provide authentication response
+    Client->>Server: Verify authentication response
+    Server->>Server: Validate response
+    Server->>Client: Return success
+    Client->>User: Show success message
+```
+
+The passkey user authentication flow involves generating options, starting authentication or registration, and verifying responses. This flow aligns with other documented authentication methods.
