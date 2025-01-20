@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 import { startAuthentication, startRegistration } from '@simplewebauthn/browser'
+import { verifyAuthentication, verifyRegistration } from '@/app/(auth)/actions'
 
 export function usePasskey() {
   const router = useRouter()
@@ -34,16 +35,12 @@ export function usePasskey() {
       const formData = new FormData();
       formData.append('response', JSON.stringify(webAuthnResponse));
 
-      const verifyResponse = await fetch(`/api/passkey/${isRegistration ? 'verify-registration' : 'verify-authentication'}`, {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!verifyResponse.ok) {
-        throw new Error('Failed to verify response');
+      let result;
+      if (isRegistration) {
+        result = await verifyRegistration(formData);
+      } else {
+        result = await verifyAuthentication(formData);
       }
-
-      const result = await verifyResponse.json();
 
       if (result.status === 'success') {
         toast.success(`WebAuthn ${isRegistration ? 'registration' : 'login'} successful`)
