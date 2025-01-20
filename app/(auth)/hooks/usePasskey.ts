@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
+import { handlePasskeyAuth } from '@/app/(auth)/actions'
 
 export function usePasskey() {
   const router = useRouter()
@@ -10,32 +11,19 @@ export function usePasskey() {
   const handlePasskeyRequest = async (email: string) => {
     setIsLoading(true)
     try {
-      const credentialRequestOptions = await fetch('/api/auth/passkey/...', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
-      }).then((res) => res.json())
+      const formData = new FormData()
+      formData.append('email', email)
+      const status = await handlePasskeyAuth(formData)
 
-      const assertion = await navigator.credentials.get({
-        publicKey: credentialRequestOptions,
-      })
-
-      const verifyResponse = await fetch('/api/auth/passkey/...', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ assertion }),
-      })
-
-      if (verifyResponse.ok) {
+      if (status.status === 'success') {
         toast.success('WebAuthn login successful')
         router.refresh()
         return true
-      } else {
+      } else if (status.status === 'failed') {
         toast.error('WebAuthn login failed')
+        return false
+      } else if (status.status === 'invalid_data') {
+        toast.error('Invalid data provided')
         return false
       }
     } catch (error) {
@@ -48,4 +36,3 @@ export function usePasskey() {
 
   return { handlePasskeyRequest, isLoading }
 }
-
