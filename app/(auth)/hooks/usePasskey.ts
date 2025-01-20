@@ -3,15 +3,27 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 import { handlePasskeyAuth, handlePasskeyRegistration } from '@/app/(auth)/actions'
+import { startAuthentication, startRegistration } from '@simplewebauthn/browser'
 
 export function usePasskey() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
 
-  const handlePasskeyRequest = async (isRegistration: boolean = false) => {
+  const handlePasskeyRequest = async (email: string, isRegistration: boolean = false) => {
     setIsLoading(true)
     try {
       const formData = new FormData()
+      formData.append('email', email)
+
+      let response
+      if (isRegistration) {
+        response = await startRegistration()
+      } else {
+        response = await startAuthentication()
+      }
+
+      formData.append('response', JSON.stringify(response))
+
       const status = isRegistration ? await handlePasskeyRegistration({ status: 'idle' }, formData) : await handlePasskeyAuth({ status: 'idle' }, formData)
 
       if (status.status === 'success') {

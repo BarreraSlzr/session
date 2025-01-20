@@ -2,6 +2,8 @@ import {
   GenerateRegistrationOptionsOpts,
   VerifyRegistrationResponseOpts,
   VerifyAuthenticationResponseOpts,
+  verifyRegistrationResponse as verifyRegistrationResponseServer,
+  verifyAuthenticationResponse as verifyAuthenticationResponseServer,
 } from '@simplewebauthn/server';
 import { AuthMethod } from '@/app/(auth)/lib/db/types';
 
@@ -34,7 +36,7 @@ export function verifyRegistrationResponse(response: any, challenge: string) {
   };
 
   // Call the actual verification function from @simplewebauthn/server
-  return verifyRegistrationResponse(opts);
+  return verifyRegistrationResponseServer(opts);
 }
 
 export function verifyAuthenticationResponse(response: any, authMethod: AuthMethod) {
@@ -46,5 +48,5 @@ export function verifyAuthenticationResponse(response: any, authMethod: AuthMeth
   };
 
   // Call the actual verification function from @simplewebauthn/server
-  return verifyAuthenticationResponse(opts);
+  return verifyAuthenticationResponseServer(opts);
 }
