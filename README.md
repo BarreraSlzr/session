@@ -91,6 +91,13 @@ The following functions use `createAuthMethod` to generate tokens:
 - `resetPassword` in `app/(auth)/lib/db/queries.ts` generates a reset password token.
 - `sendVerificationEmail` in `app/(auth)/lib/email.ts` generates a verification token.
 - `sendResetPasswordEmail` in `app/(auth)/lib/email.ts` generates a reset password token.
+- `createPasskey` in `app/(auth)/lib/db/queries.ts` generates a passkey token.
+- `createPassword` in `app/(auth)/lib/db/queries.ts` is the only method where a token is not generated. Instead, a hashed password is stored.
+
+### Explanation of expiresAt and verifiedAt
+
+For each authentication method, the `expiresAt` field indicates when the token will expire, and the `verifiedAt` field indicates when the token was verified.
+
 
 ## User Authentication Flows
 
