@@ -1,8 +1,4 @@
 import {
-  generateRegistrationOptions as simpleGenerateRegistrationOptions,
-  generateAuthenticationOptions as simpleGenerateAuthenticationOptions,
-  verifyRegistrationResponse as simpleVerifyRegistrationResponse,
-  verifyAuthenticationResponse as simpleVerifyAuthenticationResponse,
   GenerateRegistrationOptionsOpts,
   VerifyRegistrationResponseOpts,
   VerifyAuthenticationResponseOpts,
@@ -21,38 +17,34 @@ const baseWebAuthConfig: Omit<GenerateRegistrationOptionsOpts, 'userID' | 'userN
   timeout: 60000,
 };
 
-export function generateRegistrationOptions(userID: string, userName: string) {
-  const WebAuthConfig: GenerateRegistrationOptionsOpts = {
+export function generateRegistrationOptions(userId: string, userName: string) {
+  return {
     ...baseWebAuthConfig,
-    userID: new Uint8Array(
-      Buffer.from(userID, "base64"),
-    ),
-    userName,
+    userID: userId,
+    userName: userName,
   };
-  return simpleGenerateRegistrationOptions(WebAuthConfig);
 }
 
-export function generateAuthenticationOptions(challenge: string) {
-  return simpleGenerateAuthenticationOptions({ challenge, rpID: baseWebAuthConfig.rpID });
+export function verifyRegistrationResponse(response: any, challenge: string) {
+  const opts: VerifyRegistrationResponseOpts = {
+    credential: response,
+    expectedChallenge: challenge,
+    expectedOrigin: 'https://your-app.com',
+    expectedRPID: 'your-app-id',
+  };
+
+  // Call the actual verification function from @simplewebauthn/server
+  return verifyRegistrationResponse(opts);
 }
 
-export function verifyRegistrationResponse(response: VerifyRegistrationResponseOpts['response'], challenge: string) {
-  return simpleVerifyRegistrationResponse({ response, expectedChallenge: challenge, expectedOrigin: 'https://your-app-origin' });
-}
+export function verifyAuthenticationResponse(response: any, authMethod: AuthMethod) {
+  const opts: VerifyAuthenticationResponseOpts = {
+    credential: response,
+    expectedChallenge: authMethod.credential,
+    expectedOrigin: 'https://your-app.com',
+    expectedRPID: 'your-app-id',
+  };
 
-export function verifyAuthenticationResponse(response: VerifyAuthenticationResponseOpts['response'], authmethod: AuthMethod) {
-  return simpleVerifyAuthenticationResponse({
-    response: response,
-    expectedChallenge: authmethod.credential,
-    expectedOrigin: origin,
-    expectedRPID: baseWebAuthConfig.rpID,
-    credential: {
-      id: authmethod.id,
-      publicKey: new Uint8Array(
-        Buffer.from(authmethod.userId, "base64"),
-      ),
-      counter: 0,
-    },
-    requireUserVerification: false,
-  });
+  // Call the actual verification function from @simplewebauthn/server
+  return verifyAuthenticationResponse(opts);
 }

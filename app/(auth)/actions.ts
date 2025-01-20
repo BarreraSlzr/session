@@ -1,10 +1,8 @@
 'use server'
 import { z } from "zod";
-import { createSession, getUserIdFromSession } from "./lib/session";
-import { createUser, getUser, createPassword, validatePassword, updatePassword, resetPassword, verifyCredential, getAuthMethodForReset, getAuthMethodForValidation, getAuthMethodForUpdate, getPasskeyChallenge, verifyAuthenticationResponse } from "@/app/(auth)/lib/db/queries";
-import { getCookie } from "@/app/(auth)/lib/cookies";
-import { handleAuthMethodValidation, errorMessages } from "@/app/(auth)/lib/token";
-import { generateRegistrationOptions, verifyRegistrationResponse } from "@/app/(auth)/lib/passkey";
+import { createSession, getUserIdFromSession, renewSession } from "./lib/session";
+import { createUser, getUser, createPassword, validatePassword, updatePassword, resetPassword, verifyCredential, getAuthMethodForReset, getAuthMethodForValidation, getAuthMethodForUpdate, getPasskeyChallenge } from "@/app/(auth)/lib/db/queries";
+import { verifyAuthenticationResponse, generateRegistrationOptions, verifyRegistrationResponse } from "@/app/(auth)/lib/passkey";
 
 const authFormSchema = z.object({
   email: z.string().email(),
@@ -114,7 +112,10 @@ export interface Status {
   status: "success" | "failed" | "invalid_data";
 }
 
-export const handlePasskeyAuth = async (formData: FormData): Promise<Status> => {
+export const handlePasskeyAuth = async (
+  state: Status,
+  formData: FormData
+): Promise<Status> => {
   try {
     const userId = await getUserIdFromSession();
     const passkey = await getPasskeyChallenge(userId);
@@ -122,7 +123,7 @@ export const handlePasskeyAuth = async (formData: FormData): Promise<Status> => 
       ...formData
     }, passkey);
     if (verification.verified) {
-      await createSession(userId);
+      await renewSession(userId);
       return { status: "success" };
     }
     return { status: "failed" };
@@ -132,15 +133,19 @@ export const handlePasskeyAuth = async (formData: FormData): Promise<Status> => 
   }
 };
 
-export const handlePasskeyRegistration = async (formData: FormData): Promise<Status> => {
+export const handlePasskeyRegistration = async (
+  state: Status,
+  formData: FormData
+): Promise<Status> => {
   try {
     const userId = await getUserIdFromSession();
-    const options = generateRegistrationOptions(userId, formData.get("email") as string);
+    const user = await getUser(userId);
+    const options = generateRegistrationOptions(userId, user.email);
     const verification = await verifyRegistrationResponse({
       ...formData
     }, options.challenge);
     if (verification.verified) {
-      await createSession(userId);
+      await renewSession(userId);
       return { status: "success" };
     }
     return { status: "failed" };

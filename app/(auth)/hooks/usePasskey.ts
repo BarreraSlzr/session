@@ -8,12 +8,11 @@ export function usePasskey() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
 
-  const handlePasskeyRequest = async (email: string, isRegistration: boolean = false) => {
+  const handlePasskeyRequest = async (isRegistration: boolean = false) => {
     setIsLoading(true)
     try {
       const formData = new FormData()
-      formData.append('email', email)
-      const status = isRegistration ? await handlePasskeyRegistration(formData) : await handlePasskeyAuth(formData)
+      const status = isRegistration ? await handlePasskeyRegistration({ status: 'idle' }, formData) : await handlePasskeyAuth({ status: 'idle' }, formData)
 
       if (status.status === 'success') {
         toast.success(`WebAuthn ${isRegistration ? 'registration' : 'login'} successful`)
