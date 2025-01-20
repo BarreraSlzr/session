@@ -2,7 +2,6 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
-import { handlePasskeyAuth, handlePasskeyRegistration } from '@/app/(auth)/actions'
 import { startAuthentication, startRegistration } from '@simplewebauthn/browser'
 
 export function usePasskey() {
@@ -12,29 +11,46 @@ export function usePasskey() {
   const handlePasskeyRequest = async (email: string, isRegistration: boolean = false) => {
     setIsLoading(true)
     try {
-      const formData = new FormData()
-      formData.append('email', email)
+      const response = await fetch(`/api/passkey/${isRegistration ? 'generate-register-options' : 'generate-authenticate-options'}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
-      let response
-      if (isRegistration) {
-        response = await startRegistration()
-      } else {
-        response = await startAuthentication()
+      if (!response.ok) {
+        throw new Error('Failed to generate options');
       }
 
-      formData.append('response', JSON.stringify(response))
+      const options = await response.json();
 
-      const status = isRegistration ? await handlePasskeyRegistration({ status: 'idle' }, formData) : await handlePasskeyAuth({ status: 'idle' }, formData)
+      let webAuthnResponse;
+      if (isRegistration) {
+        webAuthnResponse = await startRegistration(options);
+      } else {
+        webAuthnResponse = await startAuthentication(options);
+      }
 
-      if (status.status === 'success') {
+      const formData = new FormData();
+      formData.append('response', JSON.stringify(webAuthnResponse));
+
+      const verifyResponse = await fetch(`/api/passkey/${isRegistration ? 'verify-registration' : 'verify-authentication'}`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!verifyResponse.ok) {
+        throw new Error('Failed to verify response');
+      }
+
+      const result = await verifyResponse.json();
+
+      if (result.status === 'success') {
         toast.success(`WebAuthn ${isRegistration ? 'registration' : 'login'} successful`)
         router.refresh()
         return true
-      } else if (status.status === 'failed') {
+      } else {
         toast.error(`WebAuthn ${isRegistration ? 'registration' : 'login'} failed`)
-        return false
-      } else if (status.status === 'invalid_data') {
-        toast.error('Invalid data provided')
         return false
       }
     } catch (error) {

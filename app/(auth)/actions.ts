@@ -1,8 +1,7 @@
 'use server'
 import { z } from "zod";
 import { createSession, getUserIdFromSession, renewSession } from "./lib/session";
-import { createUser, getUser, createPassword, validatePassword, updatePassword, resetPassword, verifyCredential, getAuthMethodForReset, getAuthMethodForValidation, getAuthMethodForUpdate, getPasskeyChallenge } from "@/app/(auth)/lib/db/queries";
-import { verifyAuthenticationResponse, generateRegistrationOptions, verifyRegistrationResponse } from "@/app/(auth)/lib/passkey";
+import { createUser, getUser, createPassword, validatePassword, updatePassword, resetPassword, verifyCredential, getAuthMethodForReset, getAuthMethodForValidation, getAuthMethodForUpdate } from "@/app/(auth)/lib/db/queries";
 
 const authFormSchema = z.object({
   email: z.string().email(),
@@ -111,46 +110,3 @@ export const handlePasswordChange = async (formData: FormData): Promise<Password
 export interface Status {
   status: "success" | "failed" | "invalid_data";
 }
-
-export const handlePasskeyAuth = async (
-  state: Status,
-  formData: FormData
-): Promise<Status> => {
-  try {
-    const userId = await getUserIdFromSession();
-    const passkey = await getPasskeyChallenge(userId);
-    const verification = await verifyAuthenticationResponse({
-      ...formData
-    }, passkey);
-    if (verification.verified) {
-      await renewSession(userId);
-      return { status: "success" };
-    }
-    return { status: "failed" };
-  } catch (error) {
-    console.error("Passkey authentication error:", error);
-    return { status: "failed" };
-  }
-};
-
-export const handlePasskeyRegistration = async (
-  state: Status,
-  formData: FormData
-): Promise<Status> => {
-  try {
-    const userId = await getUserIdFromSession();
-    const user = await getUser(userId);
-    const options = generateRegistrationOptions(userId, user.email);
-    const verification = await verifyRegistrationResponse({
-      ...formData
-    }, options.challenge);
-    if (verification.verified) {
-      await renewSession(userId);
-      return { status: "success" };
-    }
-    return { status: "failed" };
-  } catch (error) {
-    console.error("Passkey registration error:", error);
-    return { status: "failed" };
-  }
-};
