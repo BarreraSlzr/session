@@ -1,27 +1,12 @@
-import { generateAuthenticationOptions } from "@simplewebauthn/server";
-import { getUserIdFromSession, getUser } from "@/app/(auth)/lib/session";
-import { createPasskey } from "@/app/(auth)/lib/db/queries";
+import { getUserIdFromSession } from "@/app/(auth)/lib/session";
+import { createPasskey, getUser } from "@/app/(auth)/lib/db/queries";
+import { generateAuthenticationOptions } from "@/app/(auth)/lib/passkey";
 
 export async function GET(req: Request) {
   try {
     const userId = await getUserIdFromSession();
-    const user = await getUser(userId);
-
-    // Create a passkey for the user
     const passkey = await createPasskey(userId);
-
-    const options = generateAuthenticationOptions({
-      rpID: "your-app-id",
-      userVerification: "preferred",
-      timeout: 60000,
-      allowCredentials: [
-        {
-          id: passkey.credential,
-          type: "public-key",
-          transports: ["usb", "ble", "nfc"],
-        },
-      ],
-    });
+    const options = generateAuthenticationOptions(passkey);
 
     return new Response(JSON.stringify(options), { status: 200 });
   } catch (error) {

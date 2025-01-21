@@ -9,7 +9,7 @@ export function usePasskey() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
 
-  const handlePasskeyRequest = async (email: string, isRegistration: boolean = false) => {
+  const handlePasskeyRequest = async (isRegistration: boolean = false) => {
     setIsLoading(true)
     try {
       const response = await fetch(`/api/passkey/${isRegistration ? 'generate-register-options' : 'generate-authenticate-options'}`, {
@@ -25,26 +25,20 @@ export function usePasskey() {
 
       const options = await response.json();
 
-      let webAuthnResponse;
-      if (isRegistration) {
-        webAuthnResponse = await startRegistration(options);
-      } else {
-        webAuthnResponse = await startAuthentication(options);
-      }
+      const webAuthnResponse = isRegistration 
+        ? await startRegistration(options) 
+        : await startAuthentication(options);
 
       const formData = new FormData();
       formData.append('response', JSON.stringify(webAuthnResponse));
 
-      let result;
-      if (isRegistration) {
-        result = await verifyRegistration(formData);
-      } else {
-        result = await verifyAuthentication(formData);
-      }
+      const result = isRegistration 
+        ? await verifyRegistration(formData) 
+        : await verifyAuthentication(formData);
 
       if (result.status === 'success') {
-        toast.success(`WebAuthn ${isRegistration ? 'registration' : 'login'} successful`)
-        router.refresh()
+        toast.success(`WebAuthn ${isRegistration ? 'registration' : 'login'} successful`);
+        router.refresh();
         return true
       } else {
         toast.error(`WebAuthn ${isRegistration ? 'registration' : 'login'} failed`)

@@ -1,24 +1,14 @@
-import { generateRegistrationOptions } from "@simplewebauthn/server";
-import { getUserIdFromSession, getUser } from "@/app/(auth)/lib/session";
+
+import { createPasskey, getUser } from "@/app/(auth)/lib/db/queries";
+import { generateRegistrationOptions } from "@/app/(auth)/lib/passkey";
+import { getUserIdFromSession } from "@/app/(auth)/lib/session";
 
 export async function GET(req: Request) {
   try {
     const userId = await getUserIdFromSession();
     const user = await getUser(userId);
-
-    const options = generateRegistrationOptions({
-      rpName: "Your App Name",
-      rpID: "your-app-id",
-      userID: userId,
-      userName: user.email,
-      attestationType: "direct",
-      authenticatorSelection: {
-        authenticatorAttachment: "platform",
-        requireResidentKey: false,
-        userVerification: "preferred",
-      },
-      timeout: 60000,
-    });
+    const passkey = await createPasskey(userId);
+    const options = generateRegistrationOptions(userId, user.email, passkey);
 
     return new Response(JSON.stringify(options), { status: 200 });
   } catch (error) {

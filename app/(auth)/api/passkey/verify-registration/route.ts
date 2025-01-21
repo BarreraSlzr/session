@@ -1,6 +1,6 @@
-import { verifyRegistrationResponse } from "@simplewebauthn/server";
 import { getUserIdFromSession, renewSession } from "@/app/(auth)/lib/session";
-import { getUser } from "@/app/(auth)/lib/db/queries";
+import { getPasskeyChallenge, getUser } from "@/app/(auth)/lib/db/queries";
+import { verifyRegistrationResponse } from "@/app/(auth)/lib/passkey";
 
 export async function POST(req: Request) {
   try {
@@ -8,13 +8,13 @@ export async function POST(req: Request) {
     const response = JSON.parse(formData.get("response") as string);
 
     const userId = await getUserIdFromSession();
-    const user = await getUser(userId);
+    const passkey = await getPasskeyChallenge(userId);
 
-    const verification = await verifyRegistrationResponse(response, user.email);
+    const verification = await verifyRegistrationResponse(response, passkey.credential);
 
     if (verification.verified) {
       await renewSession(userId);
-      return new Response(JSON.stringify({ passkey: verification.passkey }), { status: 200 });
+      return new Response(JSON.stringify({ registrationInfo: verification.registrationInfo }), { status: 200 });
     }
 
     return new Response(JSON.stringify({ status: "failed" }), { status: 400 });

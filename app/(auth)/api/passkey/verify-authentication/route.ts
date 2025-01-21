@@ -1,6 +1,6 @@
-import { verifyAuthenticationResponse } from "@simplewebauthn/server";
 import { getUserIdFromSession, renewSession } from "@/app/(auth)/lib/session";
 import { getPasskeyChallenge } from "@/app/(auth)/lib/db/queries";
+import { verifyAuthenticationResponse } from "@/app/(auth)/lib/passkey";
 
 export async function POST(req: Request) {
   try {
@@ -10,7 +10,7 @@ export async function POST(req: Request) {
     const userId = await getUserIdFromSession();
     const passkey = await getPasskeyChallenge(userId);
 
-    const verification = await verifyAuthenticationResponse(response, passkey);
+    const verification = await verifyAuthenticationResponse(response, passkey.credential);
 
     if (verification.verified) {
       await renewSession(userId);

@@ -11,7 +11,7 @@
     "format": "biome format --write"
   },
   "engines": {
-      "pnpm": ">=3"
+    "pnpm": ">=3"
   },
   "dependencies": {
     "@ai-sdk/openai": "1.0.6",
@@ -33,6 +33,7 @@
     "@radix-ui/react-tabs": "^1.1.2",
     "@radix-ui/react-tooltip": "^1.1.6",
     "@radix-ui/react-visually-hidden": "^1.1.1",
+    "@simplewebauthn/browser": "^13.1.0",
     "@simplewebauthn/server": "^13.1.0",
     "@vercel/analytics": "^1.4.1",
     "@vercel/blob": "^0.24.1",

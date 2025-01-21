@@ -1,8 +1,10 @@
 'use server'
 import { z } from "zod";
 import { createSession, getUserIdFromSession, renewSession } from "./lib/session";
-import { createUser, getUser, createPassword, validatePassword, updatePassword, resetPassword, verifyCredential, getAuthMethodForReset, getAuthMethodForValidation, getAuthMethodForUpdate } from "@/app/(auth)/lib/db/queries";
+import { createUser, getUser, createPassword, validatePassword, updatePassword, resetPassword, verifyCredential, getAuthMethodForReset, getAuthMethodForValidation, getAuthMethodForUpdate, getPasskeyChallenge } from "@/app/(auth)/lib/db/queries";
 import { verifyAuthenticationResponse, verifyRegistrationResponse } from "@/app/(auth)/lib/passkey";
+import { handleAuthMethodValidation } from "@/app/(auth)/lib/token";
+import { getCookie } from "@/app/(auth)/lib/cookies";
 
 const authFormSchema = z.object({
   email: z.string().email(),
@@ -118,7 +120,7 @@ export const verifyAuthentication = async (formData: FormData): Promise<Status> 
     const userId = await getUserIdFromSession();
     const passkey = await getPasskeyChallenge(userId);
 
-    const verification = await verifyAuthenticationResponse(response, passkey);
+    const verification = await verifyAuthenticationResponse(response, passkey.credential);
 
     if (verification.verified) {
       await renewSession(userId);
@@ -136,9 +138,9 @@ export const verifyRegistration = async (formData: FormData): Promise<Status> =>
   try {
     const response = JSON.parse(formData.get("response") as string);
     const userId = await getUserIdFromSession();
-    const user = await getUser(userId);
+    const passkey = await getPasskeyChallenge(userId);
 
-    const verification = await verifyRegistrationResponse(response, user.email);
+    const verification = await verifyRegistrationResponse(response, passkey.credential);
 
     if (verification.verified) {
       await renewSession(userId);

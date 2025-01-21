@@ -15,8 +15,7 @@ export function LoginForm() {
     if (submitterId === "login") {
       await loginAction(formData);
     } else if (submitterId === "webauthn") {
-      const email = formData.get("email") as string;
-      await handlePasskeyRequest(email);
+      await handlePasskeyRequest(false);
     }
   };
 
@@ -34,7 +33,7 @@ export function LoginForm() {
         Iniciar sesión
       </SubmitButton>
       <SubmitButton id="webauthn" isLoading={webAuthnLoading}>
-        Iniciar sesión con WebAuthn
+        Iniciar sesión con Passkey
       </SubmitButton>
     </Form>
   );
