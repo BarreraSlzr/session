@@ -1,9 +1,10 @@
 'use server'
 import { z } from "zod";
-import { createSession } from "./lib/session";
-import { createUser, getUser, createPassword, validatePassword, updatePassword, resetPassword, verifyCredential, getAuthMethodForReset, getAuthMethodForValidation, getAuthMethodForUpdate } from "@/app/(auth)/lib/db/queries";
+import { createSession, getUserIdFromSession, renewSession } from "./lib/session";
+import { createUser, getUser, createPassword, validatePassword, updatePassword, resetPassword, verifyCredential, getAuthMethodForReset, getAuthMethodForValidation, getAuthMethodForUpdate, getPasskeyChallenge } from "@/app/(auth)/lib/db/queries";
+import { verifyAuthenticationResponse, verifyRegistrationResponse } from "@/app/(auth)/lib/passkey";
+import { handleAuthMethodValidation } from "@/app/(auth)/lib/token";
 import { getCookie } from "@/app/(auth)/lib/cookies";
-import { handleAuthMethodValidation, errorMessages } from "@/app/(auth)/lib/token";
 
 const authFormSchema = z.object({
   email: z.string().email(),
@@ -105,6 +106,50 @@ export const handlePasswordChange = async (formData: FormData): Promise<Password
     return { status: "success" };
   } catch (error) {
     console.error("Password change error:", error);
+    return { status: "failed" };
+  }
+};
+
+export interface Status {
+  status: "success" | "failed" | "invalid_data";
+}
+
+export const verifyAuthentication = async (formData: FormData): Promise<Status> => {
+  try {
+    const response = JSON.parse(formData.get("response") as string);
+    const userId = await getUserIdFromSession();
+    const passkey = await getPasskeyChallenge(userId);
+
+    const verification = await verifyAuthenticationResponse(response, passkey.credential);
+
+    if (verification.verified) {
+      await renewSession(userId);
+      return { status: "success" };
+    }
+
+    return { status: "failed" };
+  } catch (error) {
+    console.error("Error verifying authentication response:", error);
+    return { status: "failed" };
+  }
+};
+
+export const verifyRegistration = async (formData: FormData): Promise<Status> => {
+  try {
+    const response = JSON.parse(formData.get("response") as string);
+    const userId = await getUserIdFromSession();
+    const passkey = await getPasskeyChallenge(userId);
+
+    const verification = await verifyRegistrationResponse(response, passkey.credential);
+
+    if (verification.verified) {
+      await renewSession(userId);
+      return { status: "success" };
+    }
+
+    return { status: "failed" };
+  } catch (error) {
+    console.error("Error verifying registration response:", error);
     return { status: "failed" };
   }
 };

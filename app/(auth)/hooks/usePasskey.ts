@@ -2,44 +2,50 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
+import { startAuthentication, startRegistration } from '@simplewebauthn/browser'
+import { verifyAuthentication, verifyRegistration } from '@/app/(auth)/actions'
 
 export function usePasskey() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
 
-  const handlePasskeyRequest = async (email: string) => {
+  const handlePasskeyRequest = async (isRegistration: boolean = false) => {
     setIsLoading(true)
     try {
-      const credentialRequestOptions = await fetch('/api/auth/passkey/...', {
-        method: 'POST',
+      const response = await fetch(`/api/passkey/${isRegistration ? 'generate-register-options' : 'generate-authenticate-options'}`, {
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email }),
-      }).then((res) => res.json())
+      });
 
-      const assertion = await navigator.credentials.get({
-        publicKey: credentialRequestOptions,
-      })
+      if (!response.ok) {
+        throw new Error('Failed to generate options');
+      }
 
-      const verifyResponse = await fetch('/api/auth/passkey/...', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ assertion }),
-      })
+      const options = await response.json();
 
-      if (verifyResponse.ok) {
-        toast.success('WebAuthn login successful')
-        router.refresh()
+      const webAuthnResponse = isRegistration 
+        ? await startRegistration(options) 
+        : await startAuthentication(options);
+
+      const formData = new FormData();
+      formData.append('response', JSON.stringify(webAuthnResponse));
+
+      const result = isRegistration 
+        ? await verifyRegistration(formData) 
+        : await verifyAuthentication(formData);
+
+      if (result.status === 'success') {
+        toast.success(`WebAuthn ${isRegistration ? 'registration' : 'login'} successful`);
+        router.refresh();
         return true
       } else {
-        toast.error('WebAuthn login failed')
+        toast.error(`WebAuthn ${isRegistration ? 'registration' : 'login'} failed`)
         return false
       }
     } catch (error) {
-      toast.error('WebAuthn login error')
+      toast.error(`WebAuthn ${isRegistration ? 'registration' : 'login'} error`)
       return false
     } finally {
       setIsLoading(false)
@@ -48,4 +54,3 @@ export function usePasskey() {
 
   return { handlePasskeyRequest, isLoading }
 }
-
