@@ -1,0 +1,20 @@
+workflowVersion: 1.0.0
+speakeasyVersion: latest
+sources:
+    Session & Passkey API:
+        inputs:
+            - location: ../openapi.yaml
+        overlays:
+            - location: .speakeasy/speakeasy-modifications-overlay.yaml
+        registry:
+            location: registry.speakeasyapi.dev/internetfriends/sessions/session-&-passkey-api
+targets:
+    internet-friends:
+        target: typescript
+        source: Session & Passkey API
+        codeSamples:
+            registry:
+                location: registry.speakeasyapi.dev/internetfriends/sessions/session-&-passkey-api-typescript-code-samples
+            labelOverride:
+                fixedValue: Typescript (SDK)
+            blocking: false

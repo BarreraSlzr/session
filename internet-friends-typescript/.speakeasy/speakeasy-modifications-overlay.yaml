@@ -1,0 +1,95 @@
+overlay: 1.0.0
+x-speakeasy-jsonpath: rfc9535
+info:
+  title: Speakeasy Modifications
+  version: 0.0.3
+  x-speakeasy-metadata:
+    after: ""
+    before: ""
+    type: speakeasy-modifications
+actions:
+  - target: $["paths"]["/session/renew"]["post"]
+    update:
+      x-speakeasy-group: sessions
+      x-speakeasy-name-override: renew
+    x-speakeasy-metadata:
+      after: sdk.sessions.renew()
+      before: sdk.<no_group>.post_/session/renew()
+      created_at: 1750327783098
+      reviewed_at: 1750327806185
+      type: method-name
+  - target: $["paths"]["/session/destroy"]["post"]
+    update:
+      x-speakeasy-group: sessions
+      x-speakeasy-name-override: destroy
+    x-speakeasy-metadata:
+      after: sdk.sessions.destroy()
+      before: sdk.<no_group>.post_/session/destroy()
+      created_at: 1750327783099
+      reviewed_at: 1750327806185
+      type: method-name
+  - target: $["paths"]["/passkey/generate-authenticate-options"]["get"]
+    update:
+      x-speakeasy-group: passkeys
+      x-speakeasy-name-override: getGenerateAuthenticateOptions
+    x-speakeasy-metadata:
+      after: sdk.passkeys.getGenerateAuthenticateOptions()
+      before: sdk.<no_group>.get_/passkey/generate-authenticate-options()
+      created_at: 1750327783099
+      reviewed_at: 1750327806185
+      type: method-name
+  - target: $["paths"]["/passkey/generate-register-options"]["get"]
+    update:
+      x-speakeasy-group: passkeys
+      x-speakeasy-name-override: getGenerateRegisterOptions
+    x-speakeasy-metadata:
+      after: sdk.passkeys.getGenerateRegisterOptions()
+      before: sdk.<no_group>.get_/passkey/generate-register-options()
+      created_at: 1750327783099
+      reviewed_at: 1750327806185
+      type: method-name
+  - target: $["paths"]["/passkey/verify-authentication"]["post"]
+    update:
+      x-speakeasy-group: passkeys
+      x-speakeasy-name-override: verifyAuthentication
+    x-speakeasy-metadata:
+      after: sdk.passkeys.verifyAuthentication()
+      before: sdk.<no_group>.post_/passkey/verify-authentication()
+      created_at: 1750327783099
+      reviewed_at: 1750327806185
+      type: method-name
+  - target: $["paths"]["/passkey/verify-registration"]["post"]
+    update:
+      x-speakeasy-group: passkeys
+      x-speakeasy-name-override: verifyRegistration
+    x-speakeasy-metadata:
+      after: sdk.passkeys.verifyRegistration()
+      before: sdk.<no_group>.post_/passkey/verify-registration()
+      created_at: 1750327783099
+      reviewed_at: 1750327806185
+      type: method-name
+  - target: $["paths"]["/session/status"]["get"]
+    update:
+      x-speakeasy-group: sessions
+      x-speakeasy-name-override: status
+    x-speakeasy-metadata:
+      after: sdk.sessions.status()
+      before: sdk.<no_group>.get_/session/status()
+      created_at: 1750327783099
+      reviewed_at: 1750327806185
+      type: method-name
+  - target: $
+    update:
+      x-speakeasy-retries:
+        strategy: backoff
+        backoff:
+          initialInterval: 500
+          maxInterval: 60000
+          maxElapsedTime: 3600000
+          exponent: 1.5
+        statusCodes:
+          - 5XX
+        retryConnectionErrors: true
+    x-speakeasy-metadata:
+      created_at: 1750327898368
+      type: user-edit
