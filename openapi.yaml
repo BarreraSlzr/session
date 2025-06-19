@@ -12,16 +12,6 @@ info:
     - Error handling with standardized error codes
     
     All endpoints return consistent error responses with machine-readable codes.
-  description: |
-    API documentation for session and passkey authentication endpoints.
-    
-    This API provides authentication services including:
-    - Session management (create, validate, renew, destroy)
-    - Passkey authentication (generate options, verify responses)
-    - User management
-    - Error handling with standardized error codes
-    
-    All endpoints return consistent error responses with machine-readable codes.
 servers:
   - url: /api
     description: API base URL
@@ -32,7 +22,6 @@ paths:
       description: Generates WebAuthn authentication options for passkey-based login
       security:
         - sessionAuth: []
-      description: Generates WebAuthn authentication options for passkey-based login
       responses:
         '200':
           description: Authentication options generated successfully
@@ -209,13 +198,6 @@ paths:
         - sessionAuth: []
       responses:
         '200':
-          description: Session destroyed successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SessionDestroy'
-        '401':
-          description: Unauthorized - Invalid session token
           description: Session destroyed successfully
           content:
             application/json:

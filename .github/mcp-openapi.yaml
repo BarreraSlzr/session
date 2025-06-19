@@ -1,0 +1,9 @@
+# MCP rule: Require openapi.yaml update for API changes
+rules:
+  - name: Require OpenAPI update for API changes
+    if:
+      - files_modified: ['app/(auth)/api/**']
+    then:
+      - files_modified: ['openapi.yaml']
+    message: |
+      If you change any API endpoint, you must also update openapi.yaml to match the new API contract. 

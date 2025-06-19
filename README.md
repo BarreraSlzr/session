@@ -4,6 +4,15 @@
 [![Vercel](https://img.shields.io/github/deployments/<OWNER>/<REPO>/production?label=vercel)](https://vercel.com/<OWNER>/<REPO>/deployments)
 [![Docs/Onboarding](https://github.com/<OWNER>/<REPO>/actions/workflows/docs-onboarding.yml/badge.svg)](https://github.com/<OWNER>/<REPO>/actions/workflows/docs-onboarding.yml)
 
+## 📚 Documentation
+- [Project Overview](docs/overview.md)
+- [Architecture](docs/architecture.md)
+- [API Reference](docs/api.md)
+- [Onboarding Guide](docs/ONBOARDING.md)
+- [Type System](docs/type-system.md)
+- [Error Handling](docs/error-handling.md)
+- [OpenAPI Spec](openapi.yaml)
+
 ## Badges
 - **Lint:** Code style and formatting checks (auto-run on every PR).
 - **Tests:** Automated test suite status.
@@ -15,7 +24,7 @@
 
 ⚠️ For all enforceable rules and standards, see `.cursor/rules/`. This README is for usage, onboarding, and high-level documentation only.
 
-This project is a user authentication system built with Next.js. It includes various components and hooks to handle user registration, login, password reset, and session management.
+This project is a user authentication system built with Next.js, designed to be LLM- and onboarding-friendly. It features automated documentation, CI/CD, and a modular, type-safe architecture. For detailed flows, usage, and technical docs, see the [docs/](docs/) directory.
 
 ## Main Entities and Relationships
 
