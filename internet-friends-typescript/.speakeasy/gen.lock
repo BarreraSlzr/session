@@ -1,0 +1,211 @@
+lockVersion: 2.0.0
+id: c0c640c1-faa0-43b9-84fe-cbfb78f0421c
+management:
+  docChecksum: 205ea566b635ad58bb49322e97eabc6b
+  docVersion: 1.0.0
+  speakeasyVersion: 1.567.0
+  generationVersion: 2.632.0
+  releaseVersion: 0.1.2
+  configChecksum: 1dbbbb1d97235b311ca5128f43f485c3
+features:
+  typescript:
+    additionalDependencies: 0.1.0
+    core: 3.21.11
+    defaultEnabledRetries: 0.1.0
+    devContainers: 2.90.0
+    enumUnions: 0.1.0
+    envVarSecurityUsage: 0.1.2
+    globalSecurity: 2.82.13
+    globalSecurityCallbacks: 0.1.0
+    globalSecurityFlattening: 0.1.0
+    globalServerURLs: 2.82.5
+    groups: 2.81.2
+    mcpServer: 0.9.2
+    methodArguments: 0.1.2
+    nameOverrides: 2.81.2
+    responseFormat: 0.2.3
+    retries: 2.83.0
+    sdkHooks: 0.3.0
+generatedFiles:
+  - .devcontainer/README.md
+  - .devcontainer/devcontainer.json
+  - .devcontainer/setup.sh
+  - .gitattributes
+  - .npmignore
+  - FUNCTIONS.md
+  - RUNTIMES.md
+  - USAGE.md
+  - docs/lib/utils/retryconfig.md
+  - docs/models/allowcredential.md
+  - docs/models/authenticatorselection.md
+  - docs/models/errors/errort.md
+  - docs/models/passkeyauthenticationoptions.md
+  - docs/models/passkeyregistrationoptions.md
+  - docs/models/passkeyregistrationsuccess.md
+  - docs/models/passkeyverificationrequest.md
+  - docs/models/passkeyverificationsuccess.md
+  - docs/models/passkeyverificationsuccessstatus.md
+  - docs/models/pubkeycredparam.md
+  - docs/models/registrationinfo.md
+  - docs/models/rp.md
+  - docs/models/security.md
+  - docs/models/sessiondestroy.md
+  - docs/models/sessionrenew.md
+  - docs/models/sessionstatus.md
+  - docs/models/sessionstatusstatus.md
+  - docs/models/user.md
+  - docs/sdks/internetfriends/README.md
+  - docs/sdks/passkeys/README.md
+  - docs/sdks/sessions/README.md
+  - eslint.config.mjs
+  - jsr.json
+  - package.json
+  - src/core.ts
+  - src/funcs/passkeysGetGenerateAuthenticateOptions.ts
+  - src/funcs/passkeysGetGenerateRegisterOptions.ts
+  - src/funcs/passkeysVerifyAuthentication.ts
+  - src/funcs/passkeysVerifyRegistration.ts
+  - src/funcs/sessionsDestroy.ts
+  - src/funcs/sessionsRenew.ts
+  - src/funcs/sessionsStatus.ts
+  - src/hooks/hooks.ts
+  - src/hooks/index.ts
+  - src/hooks/types.ts
+  - src/index.ts
+  - src/lib/base64.ts
+  - src/lib/config.ts
+  - src/lib/dlv.ts
+  - src/lib/encodings.ts
+  - src/lib/env.ts
+  - src/lib/files.ts
+  - src/lib/http.ts
+  - src/lib/is-plain-object.ts
+  - src/lib/logger.ts
+  - src/lib/matchers.ts
+  - src/lib/primitives.ts
+  - src/lib/retries.ts
+  - src/lib/schemas.ts
+  - src/lib/sdks.ts
+  - src/lib/security.ts
+  - src/lib/url.ts
+  - src/mcp-server/build.mts
+  - src/mcp-server/cli.ts
+  - src/mcp-server/cli/start/command.ts
+  - src/mcp-server/cli/start/impl.ts
+  - src/mcp-server/console-logger.ts
+  - src/mcp-server/extensions.ts
+  - src/mcp-server/mcp-server.ts
+  - src/mcp-server/prompts.ts
+  - src/mcp-server/resources.ts
+  - src/mcp-server/scopes.ts
+  - src/mcp-server/server.ts
+  - src/mcp-server/shared.ts
+  - src/mcp-server/tools.ts
+  - src/mcp-server/tools/passkeysGetGenerateAuthenticateOptions.ts
+  - src/mcp-server/tools/passkeysGetGenerateRegisterOptions.ts
+  - src/mcp-server/tools/passkeysVerifyAuthentication.ts
+  - src/mcp-server/tools/passkeysVerifyRegistration.ts
+  - src/mcp-server/tools/sessionsDestroy.ts
+  - src/mcp-server/tools/sessionsRenew.ts
+  - src/mcp-server/tools/sessionsStatus.ts
+  - src/models/errors/error.ts
+  - src/models/errors/httpclienterrors.ts
+  - src/models/errors/index.ts
+  - src/models/errors/internetfriendsdefaulterror.ts
+  - src/models/errors/internetfriendserror.ts
+  - src/models/errors/responsevalidationerror.ts
+  - src/models/errors/sdkvalidationerror.ts
+  - src/models/index.ts
+  - src/models/passkeyauthenticationoptions.ts
+  - src/models/passkeyregistrationoptions.ts
+  - src/models/passkeyregistrationsuccess.ts
+  - src/models/passkeyverificationrequest.ts
+  - src/models/passkeyverificationsuccess.ts
+  - src/models/security.ts
+  - src/models/sessiondestroy.ts
+  - src/models/sessionrenew.ts
+  - src/models/sessionstatus.ts
+  - src/sdk/index.ts
+  - src/sdk/passkeys.ts
+  - src/sdk/sdk.ts
+  - src/sdk/sessions.ts
+  - src/types/async.ts
+  - src/types/blobs.ts
+  - src/types/constdatetime.ts
+  - src/types/enums.ts
+  - src/types/fp.ts
+  - src/types/index.ts
+  - src/types/operations.ts
+  - src/types/rfcdate.ts
+  - src/types/streams.ts
+  - tsconfig.json
+examples:
+  get_/passkey/generate-authenticate-options:
+    speakeasy-default-get-/passkey/generate-authenticate-options:
+      responses:
+        "200":
+          application/json: {"challenge": "<value>", "timeout": 54173, "rpId": "<id>", "userVerification": "<value>"}
+        "401":
+          application/json: {"error": "<value>"}
+        "500":
+          application/json: {"error": "<value>"}
+  get_/passkey/generate-register-options:
+    speakeasy-default-get-/passkey/generate-register-options:
+      responses:
+        "200":
+          application/json: {"challenge": "<value>", "timeout": 803312, "rp": {"name": "<value>", "id": "<id>"}, "user": {"id": "<id>", "name": "<value>", "displayName": "Alize8"}, "pubKeyCredParams": [], "authenticatorSelection": {"authenticatorAttachment": "<value>", "requireResidentKey": true, "userVerification": "<value>"}, "attestation": "<value>"}
+        "401":
+          application/json: {"error": "<value>"}
+        "500":
+          application/json: {"error": "<value>"}
+  post_/passkey/verify-authentication:
+    speakeasy-default-post-/passkey/verify-authentication:
+      requestBody:
+        multipart/form-data: {"response": "<value>"}
+      responses:
+        "200":
+          application/json: {"status": "success"}
+        "400":
+          application/json: {"error": "<value>"}
+        "500":
+          application/json: {"error": "<value>"}
+  post_/passkey/verify-registration:
+    speakeasy-default-post-/passkey/verify-registration:
+      requestBody:
+        multipart/form-data: {"response": "<value>"}
+      responses:
+        "200":
+          application/json: {"registrationInfo": {"credentialID": "<id>", "credentialPublicKey": "<value>", "counter": 211608}}
+        "400":
+          application/json: {"error": "<value>"}
+        "500":
+          application/json: {"error": "<value>"}
+  get_/session/status:
+    speakeasy-default-get-/session/status:
+      responses:
+        "200":
+          application/json: {"status": "valid", "userId": "fd5d6ec6-f16a-4ad7-9dce-a1aed35eba8c"}
+        "401":
+          application/json: {"error": "<value>"}
+        "500":
+          application/json: {"error": "<value>"}
+  post_/session/renew:
+    speakeasy-default-post-/session/renew:
+      responses:
+        "200":
+          application/json: {"token": "<value>"}
+        "401":
+          application/json: {"error": "<value>"}
+        "500":
+          application/json: {"error": "<value>"}
+  post_/session/destroy:
+    speakeasy-default-post-/session/destroy:
+      responses:
+        "200":
+          application/json: {"message": "Session destroyed successfully"}
+        "401":
+          application/json: {"error": "<value>"}
+        "500":
+          application/json: {"error": "<value>"}
+examplesVersion: 1.0.2
+generatedTests: {}

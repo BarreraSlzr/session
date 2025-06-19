@@ -1,0 +1,8 @@
+workflowVersion: v1
+sources:
+  openapi:
+    source: ./openapi.yaml
+targets:
+  sdk:
+    target: typescript
+    output: ./sdk
