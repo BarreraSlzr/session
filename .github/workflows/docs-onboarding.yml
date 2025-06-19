@@ -1,0 +1,23 @@
+name: Docs & Onboarding Check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  docs-onboarding:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: bun install
+      - run: bun scripts/onboard-llm.ts --export onboarding-output.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: onboarding-output
+          path: onboarding-output.txt 

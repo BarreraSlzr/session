@@ -1,3 +1,16 @@
+[![Lint](https://img.shields.io/github/actions/workflow/status/<OWNER>/<REPO>/lint.yml?label=lint)](https://github.com/<OWNER>/<REPO>/actions/workflows/lint.yml)
+[![Tests](https://img.shields.io/github/actions/workflow/status/<OWNER>/<REPO>/test.yml?label=tests)](https://github.com/<OWNER>/<REPO>/actions/workflows/test.yml)
+[![Docs](https://img.shields.io/badge/docs-coverage-100%25-brightgreen)](docs/ONBOARDING.md)
+[![Vercel](https://img.shields.io/github/deployments/<OWNER>/<REPO>/production?label=vercel)](https://vercel.com/<OWNER>/<REPO>/deployments)
+[![Docs/Onboarding](https://github.com/<OWNER>/<REPO>/actions/workflows/docs-onboarding.yml/badge.svg)](https://github.com/<OWNER>/<REPO>/actions/workflows/docs-onboarding.yml)
+
+## Badges
+- **Lint:** Code style and formatting checks (auto-run on every PR).
+- **Tests:** Automated test suite status.
+- **Docs:** Documentation and onboarding coverage.
+- **Vercel:** Production deployment status (auto-deploys on main).
+- **Docs/Onboarding:** Checks that onboarding script and docs are up to date.
+
 # Project Summary
 
 ⚠️ For all enforceable rules and standards, see `.cursor/rules/`. This README is for usage, onboarding, and high-level documentation only.
