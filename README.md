@@ -118,6 +118,17 @@ sequenceDiagram
     Client->>User: Show success message
 ```
 
+## Database Type Generation
+
+This project uses [kysely-codegen](https://github.com/kysely-org/kysely-codegen) to generate TypeScript types from the live database schema.
+
+- **Script:** `npm run db:typegen`
+- **Output:** `app/(auth)/lib/types/database.generated.ts`
+- **When to run:** After every migration or schema change.
+
+This ensures your TypeScript types stay in sync with your database schema. Never edit the generated file by hand.
+
+
 ### Login Flow
 
 ```mermaid

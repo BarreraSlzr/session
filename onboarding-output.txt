@@ -1,0 +1,315 @@
+
+=== ONBOARDING GUIDE ===
+
+
+--- docs/ONBOARDING.md ---
+
+# Onboarding Guide
+
+Welcome to the project! This guide is designed to help both human developers and LLMs quickly understand the structure, conventions, and best practices of this codebase.
+
+## Key Conventions
+
+- **JSDoc Everywhere:** Every file and export is documented with JSDoc for IDE and LLM support.
+- **Named Exports Only:** All exports are named; no default exports anywhere.
+- **Explicit Index Exports:** Index files use explicit named exports only (never `export * from ...`).
+- **File-Level Summaries:** Every file starts with a summary JSDoc comment describing its purpose.
+- **Per-Export Comments:** Each exported value (type, function, constant) has a concise, context-rich JSDoc comment.
+- **Rules Directory:** All coding standards are formalized in `.cursor/rules/`.
+
+## Directory Overview
+
+- `app/(auth)/lib/types/` — Centralized type system. All types are documented and inferred from schemas.
+- `app/(auth)/lib/schemas/` — All validation and database schemas, with per-export docs. Includes Zod and Kysely schemas.
+- `app/(auth)/lib/db/queries/` — Query utilities for the database. Each function is documented.
+- `__tests__/` — All tests live here, near the code they test.
+- `.cursor/rules/` — All enforced code style and documentation rules.
+- `CONTRIBUTING.md` — Contributor workflow, coding standards, and review process.
+
+## How to Find What You Need
+
+- **Looking for a type?** Start in `types/` or `schemas/`, hover for docs in your IDE.
+- **Need to validate data?** Use a Zod schema from `schemas/zod/validation/`.
+- **Working with the database?** See `db/queries/` and `schemas/kysely/`.
+- **Error handling?** All error codes, messages, and helpers are in `types/errors.ts`.
+
+## Coding Standards
+
+- All rules are in `.cursor/rules/` and summarized in `CONTRIBUTING.md`.
+- Every PR is reviewed for documentation, type safety, and code style.
+- See `.cursor/rules/jsdoc-per-export.md`, `.cursor/rules/named-exports.md`, `.cursor/rules/file-level-summary.md`, and `.cursor/rules/no-default-exports.md` for specifics.
+
+## Example: Adding a New Type or Schema
+
+1. Define your Zod schema in `schemas/zod/validation/` with a JSDoc comment.
+2. Infer the type in `types/schemas.ts` with a JSDoc comment.
+3. Add or update file-level summary comments as needed.
+4. Use named exports only.
+5. Add tests in `__tests__/` if needed.
+6. Update documentation if you add new features or rules.
+
+## Example: Adding a New API Endpoint
+
+1. Update or add the route handler in the appropriate directory.
+2. Add or update the Zod schema for request/response validation.
+3. Update the OpenAPI spec (`openapi.yaml`).
+4. Add or update types in `types/` as needed.
+5. Document all exports and files with JSDoc.
+6. Add tests and update docs.
+
+---
+
+**Happy coding! If you have questions, check the rules, CONTRIBUTING.md, or ask in your team chat.** 
+
+=== CURSOR RULES ===
+
+
+--- .cursor/rules/code-style.md ---
+
+# Code Style & Export Syntax Rule
+
+> **Rule:** Do not add project or module rules to README.md files; all enforceable or reference rules must go in `.cursor/rules/` as `.md` files. `README.md` should only contain usage, onboarding, or high-level documentation, not enforceable rules.
+
+## Index File Pattern
+- Every `index.ts` must start with a summary doc comment describing its purpose and referencing source files for details.
+- Use **explicit named exports** for each module, with a short comment referencing the source file.
+- Use `export * from` **only** for submodules that are already documented at their entry point (i.e., their own `index.ts` or file has a summary doc comment).
+- **No default exports** in any file.
+- **No inline JSDoc in the index** (keep those in the source files).
+
+## Minimal, Scalable Example
+```typescript
+/**
+ * Centralized types for the authentication API.
+ * See each source file for detailed docs.
+ */
+export { User, isUser } from './database'; // See database.ts
+export type { ApiResponse } from './api';  // See api.ts
+export * from './errors';                  // Only if errors.ts is documented
+```
+
+## Documentation
+- All leaf modules must have JSDoc comments for every export.
+- Each export group in an index file should reference the submodule's documentation for details.
+- Only use `export * from` for submodules that are already documented at their entry point.
+
+## Import Patterns
+- Prefer importing from the main index for most use cases.
+- Import directly from the source file for specific needs or to avoid circular dependencies.
+- Import types from the centralized types index.
+
+## LLM/Codegen Friendliness
+- Keep index files minimal, explicit, and well-documented for easy navigation and code generation.
+- Update index files and documentation when adding new exports or modules. 
+
+--- .cursor/rules/separation-of-concerns.md ---
+
+# Separation of Concerns Rule
+
+> **Rule:** Do not add project or module rules to README.md files; all enforceable or reference rules must go in `.cursor/rules/` as `.md` files. `README.md` should only contain usage, onboarding, or high-level documentation, not enforceable rules.
+
+## Architectural Boundaries
+- Each module/folder should handle a single domain or concern (e.g., users, sessions, passkeys, validation, database, types).
+- Zod schemas, validation helpers, database schemas, and error registries must be kept in separate, clearly named folders/files.
+- Avoid circular dependencies by importing only from source files, not from re-exported index files.
+
+## Modularity
+- Each file should implement one specific responsibility (e.g., user validation, session helpers, passkey schemas).
+- Validation logic, type definitions, and error handling must be modular and not mixed in the same file.
+- New features or domains should be added as new modules, not by expanding existing ones.
+
+## Single Source of Truth
+- All schemas, types, and error codes must have a single, canonical definition in the codebase.
+- The type system (`app/(auth)/lib/types/index.ts`) is the single source of truth for all shared types.
+- The error registry (`app/(auth)/lib/types/errors.ts`) is the single source of truth for error codes and messages.
+- The OpenAPI spec (`/openapi.yaml`) must always reflect the current API contract.
+
+## Error Handling
+- All errors must be created and managed through the centralized error registry.
+- Error codes, messages, and status codes must be standardized and type-safe.
+- API error responses must be structured and consistent across all endpoints.
+
+## Type System Separation
+- Database types, API types, Zod-inferred types, and configuration types must be defined in separate files and re-exported from a central index.
+- Type guards and utility types should be kept in their own modules.
+- Never mix runtime logic with type definitions.
+
+## Documentation
+- Each module and index file must have a summary doc comment describing its purpose and boundaries.
+- All architectural changes must be reflected in the relevant README and, if needed, in this rule file. 
+
+--- .cursor/rules/file-level-summary.md ---
+
+# Rule: File-Level Summary JSDoc Comments
+
+## Rationale
+A file-level summary JSDoc comment at the top of each module improves onboarding, code navigation, and documentation generation. It helps developers quickly understand the purpose and usage of a file without reading its entire contents.
+
+## Requirements
+- Every file in `types/`, `schemas/`, `validation/`, and `db/queries/` must start with a file-level summary JSDoc comment.
+- The comment should describe the module's purpose, what it exports, and any important usage notes.
+- The summary should be concise (2-6 lines is typical).
+
+## Examples
+```ts
+/**
+ * Centralized type inference from Zod schemas for the authentication API.
+ *
+ * This module re-exports types inferred from Zod validation schemas, providing a single source of truth
+ * for API, form, and database types. Maintains backward compatibility while using the centralized schemas.
+ */
+```
+
+## Enforcement
+- PRs that add or modify files in the specified directories must include or update the file-level summary comment.
+- Reviewers should request changes if the summary is missing or unclear. 
+
+--- .cursor/rules/jsdoc-per-export.md ---
+
+# Rule: Per-Export JSDoc Comments for Type and Schema Files
+
+## Rationale
+To maximize IDE support, onboarding clarity, and maintainability, every exported value (type, function, constant) in type and schema files must have its own concise, context-rich JSDoc comment. This ensures that when a developer hovers over an export in their editor, they receive immediate, relevant documentation.
+
+## Requirements
+- Every exported value (type, function, constant) in files such as `types/`, `schemas/`, and `validation/` must have a JSDoc comment directly above the export.
+- The comment should explain what the export is, what it represents, and its intended usage.
+- Avoid block/group comments that do not attach to a specific export.
+- Comments should be concise but informative (1-3 lines is typical).
+
+## Examples
+```ts
+/**
+ * User object type inferred from UserSchema.
+ * Used for user data returned by the API.
+ */
+export type UserFromSchema = z.infer<typeof UserSchema>;
+
+/**
+ * Helper function to validate login form input.
+ */
+export function validateLoginForm(data: unknown): LoginFormFromSchema { ... }
+```
+
+## Enforcement
+- PRs that add or modify exports in type/schema/validation files must include or update JSDoc comments for each export.
+- Reviewers should request changes if any export lacks a JSDoc comment or if the comment is unclear or generic.
+
+## Exceptions
+- Internal helper functions or values not exported do not require JSDoc unless they are complex or non-obvious. 
+
+--- .cursor/rules/named-exports.md ---
+
+# Rule: Explicit Named Exports in Index Files
+
+## Rationale
+Explicit named exports improve code clarity, enable better tree-shaking, and make refactoring safer. They also make it easier to track what is exported from each module and avoid accidental export of internal APIs.
+
+## Requirements
+- All `index.ts` files must use explicit named exports (never `export * from ...`).
+- Group and comment exports by concern/module.
+- Use `export type { ... }` for type-only exports.
+- No default exports.
+- Order exports alphabetically or by logical grouping.
+- Prefer a single export statement per file.
+
+## Examples
+```ts
+// Good
+export { createUser, getUser } from './user';
+export type { User, UserInsert } from './user';
+
+// Bad
+export * from './user';
+export default createUser;
+```
+
+## Enforcement
+- PRs that add or modify index files must use explicit named exports only.
+- Reviewers should request changes if `export * from ...` or default exports are used in index files. 
+
+--- .cursor/rules/no-default-exports.md ---
+
+# Rule: No Default Exports
+
+## Rationale
+Default exports can lead to import ambiguity, make refactoring harder, and are less compatible with some tooling. Named exports are explicit and safer for large codebases.
+
+## Requirements
+- Default exports are not allowed anywhere in the codebase.
+- Always use named exports for functions, types, and constants.
+
+## Examples
+```ts
+// Good
+export function createUser() { ... }
+export type User = { ... };
+
+// Bad
+export default function createUser() { ... }
+export default User;
+```
+
+## Enforcement
+- PRs that add or modify files with default exports will be rejected.
+- Reviewers should request changes if a default export is found. 
+
+=== FILE-LEVEL SUMMARIES ===
+
+
+--- app/(auth)/lib/types/errors.ts (summary) ---
+
+/**
+ * Centralized error codes, messages, and types for the authentication API
+ *
+ * This module defines error code constants, message mappings, status codes, and type aliases
+ * for consistent and type-safe error handling across the authentication system.
+ *
+ * Usage:
+ *   - Use `ERROR_CODES` for referencing error codes in logic and error creation.
+ *   - Use `ERROR_MESSAGES` for mapping error codes to user-friendly messages.
+ *   - Use `ERROR_STATUS_CODES` for mapping error codes to HTTP status codes.
+ *   - Use `ErrorCode` type for type-safe error code usage.
+ *   - Use `errorMessages` for legacy error message mapping (backward compatibility).
+ */
+
+--- app/(auth)/lib/types/schemas.ts (summary) ---
+
+/**
+ * Centralized type inference from Zod schemas for the authentication API
+ *
+ * This module re-exports types inferred from Zod validation schemas, providing a single source of truth
+ * for API, form, and database types. Maintains backward compatibility while using the centralized schemas.
+ *
+ * Usage:
+ *   - Import types from this file for type-safe API handlers, validation, and documentation.
+ *   - All types are inferred from the latest Zod schemas in the validation directory.
+ */
+
+--- app/(auth)/lib/types/index.ts (summary) ---
+
+/**
+ * Centralized type system for the authentication API
+ *
+ * This module re-exports all types and constants from modular files for easy importing and type safety.
+ * Each submodule is documented at its source; see individual files for detailed type documentation.
+ * Only use `export * from` for submodules that are already documented at their entry point.
+ */
+
+--- app/(auth)/lib/db/queries/authMethod.ts (summary) ---
+
+/**
+ * Query utilities for the 'auth_method' table
+ *
+ * Provides functions to create, retrieve, update, and delete authentication methods for users.
+ * All functions are type-safe and return typed results for use in authentication flows.
+ */
+
+--- app/(auth)/lib/db/queries/user.ts (summary) ---
+
+/**
+ * Query utilities for the 'user' table
+ *
+ * Provides functions to create and retrieve user records in the database.
+ * All functions are type-safe and return typed results for use in authentication flows.
+ */

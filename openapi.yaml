@@ -1,0 +1,504 @@
+openapi: 3.0.3
+info:
+  title: Session & Passkey API
+  version: 1.0.0
+  description: |
+    API documentation for session and passkey authentication endpoints.
+    
+    This API provides authentication services including:
+    - Session management (create, validate, renew, destroy)
+    - Passkey authentication (generate options, verify responses)
+    - User management
+    - Error handling with standardized error codes
+    
+    All endpoints return consistent error responses with machine-readable codes.
+servers:
+  - url: /api
+    description: API base URL
+paths:
+  /passkey/generate-authenticate-options:
+    get:
+      summary: Generate authentication options for passkey login
+      description: Generates WebAuthn authentication options for passkey-based login
+      security:
+        - sessionAuth: []
+      responses:
+        '200':
+          description: Authentication options generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasskeyAuthenticationOptions'
+        '401':
+          description: Unauthorized - Invalid or missing session
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /passkey/generate-register-options:
+    get:
+      summary: Generate registration options for passkey
+      description: Generates WebAuthn registration options for creating a new passkey
+      security:
+        - sessionAuth: []
+      responses:
+        '200':
+          description: Registration options generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasskeyRegistrationOptions'
+        '401':
+          description: Unauthorized - Invalid or missing session
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /passkey/verify-authentication:
+    post:
+      summary: Verify passkey authentication response
+      description: Verifies a WebAuthn authentication response from the client
+      security:
+        - sessionAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PasskeyVerificationRequest'
+      responses:
+        '200':
+          description: Authentication verified successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasskeyVerificationSuccess'
+        '400':
+          description: Bad Request - Verification failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized - Invalid or missing session
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /passkey/verify-registration:
+    post:
+      summary: Verify passkey registration response
+      description: Verifies a WebAuthn registration response from the client
+      security:
+        - sessionAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PasskeyVerificationRequest'
+      responses:
+        '200':
+          description: Registration verified successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasskeyRegistrationSuccess'
+        '400':
+          description: Bad Request - Registration failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized - Invalid or missing session
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /session/status:
+    get:
+      summary: Check session status
+      description: Validates the current session and returns user information
+      security:
+        - sessionAuth: []
+      responses:
+        '200':
+          description: Session is valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionStatus'
+        '401':
+          description: Unauthorized - Invalid session token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /session/renew:
+    post:
+      summary: Renew session
+      description: Creates a new session token and extends the session duration
+      security:
+        - sessionAuth: []
+      responses:
+        '200':
+          description: Session renewed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionRenew'
+        '401':
+          description: Unauthorized - Invalid session token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /session/destroy:
+    post:
+      summary: Destroy session
+      description: Invalidates the current session and logs the user out
+      security:
+        - sessionAuth: []
+      responses:
+        '200':
+          description: Session destroyed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionDestroy'
+        '401':
+          description: Unauthorized - Invalid session token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  securitySchemes:
+    sessionAuth:
+      type: apiKey
+      in: cookie
+      name: session
+      description: Session cookie for authentication
+  schemas:
+    # Error schemas
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Human-readable error message
+        code:
+          type: string
+          description: Machine-readable error code
+          example: "SESSION_TOKEN_INVALID"
+        details:
+          type: object
+          description: Additional error details
+          additionalProperties: true
+        timestamp:
+          type: string
+          format: date-time
+          description: ISO timestamp when the error occurred
+      required:
+        - error
+      example:
+        sessionTokenInvalid:
+          summary: Session token invalid
+    
+    # Session schemas
+    SessionStatus:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [valid]
+          description: Session status
+        userId:
+          type: string
+          format: uuid
+          description: User ID associated with the session
+      required:
+        - status
+        - userId
+    
+    SessionRenew:
+      type: object
+      properties:
+        token:
+          type: string
+          description: New session token
+      required:
+        - token
+    
+    SessionDestroy:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Success message
+          example: "Session destroyed successfully"
+      required:
+        - message
+    
+    # Passkey schemas
+    PasskeyAuthenticationOptions:
+      type: object
+      properties:
+        challenge:
+          type: string
+          description: Base64-encoded challenge
+        timeout:
+          type: integer
+          description: Timeout in milliseconds
+        rpId:
+          type: string
+          description: Relying party ID
+        allowCredentials:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: Base64-encoded credential ID
+              type:
+                type: string
+                description: Credential type
+        userVerification:
+          type: string
+          description: User verification requirement
+      required:
+        - challenge
+        - timeout
+        - rpId
+        - userVerification
+    
+    PasskeyRegistrationOptions:
+      type: object
+      properties:
+        challenge:
+          type: string
+          description: Base64-encoded challenge
+        timeout:
+          type: integer
+          description: Timeout in milliseconds
+        rp:
+          type: object
+          properties:
+            name:
+              type: string
+              description: Relying party name
+            id:
+              type: string
+              description: Relying party ID
+          required:
+            - name
+            - id
+        user:
+          type: object
+          properties:
+            id:
+              type: string
+              description: User ID
+            name:
+              type: string
+              description: Username
+            displayName:
+              type: string
+              description: Display name
+          required:
+            - id
+            - name
+            - displayName
+        pubKeyCredParams:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                description: Credential type
+              alg:
+                type: integer
+                description: Algorithm identifier
+          required:
+            - type
+            - alg
+        authenticatorSelection:
+          type: object
+          properties:
+            authenticatorAttachment:
+              type: string
+              description: Authenticator attachment preference
+            requireResidentKey:
+              type: boolean
+              description: Whether resident key is required
+            userVerification:
+              type: string
+              description: User verification requirement
+          required:
+            - authenticatorAttachment
+            - requireResidentKey
+            - userVerification
+        attestation:
+          type: string
+          description: Attestation conveyance preference
+      required:
+        - challenge
+        - timeout
+        - rp
+        - user
+        - pubKeyCredParams
+        - authenticatorSelection
+        - attestation
+    
+    PasskeyVerificationRequest:
+      type: object
+      properties:
+        response:
+          type: string
+          description: JSON stringified WebAuthn response
+      required:
+        - response
+    
+    PasskeyVerificationSuccess:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [success]
+          description: Verification status
+      required:
+        - status
+    
+    PasskeyRegistrationSuccess:
+      type: object
+      properties:
+        registrationInfo:
+          type: object
+          properties:
+            credentialID:
+              type: string
+              description: Base64-encoded credential ID
+            credentialPublicKey:
+              type: string
+              description: Base64-encoded public key
+            counter:
+              type: integer
+              description: Signature counter
+          required:
+            - credentialID
+            - credentialPublicKey
+            - counter
+      required:
+        - registrationInfo
+    
+    # User schemas
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: User ID
+        email:
+          type: string
+          format: email
+          description: User email address
+        name:
+          type: string
+          description: User display name
+        createdAt:
+          type: string
+          format: date-time
+          description: Account creation timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          description: Last update timestamp
+      required:
+        - id
+        - email
+        - createdAt
+        - updatedAt
+    
+    # Auth method schemas
+    AuthMethod:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Auth method ID
+        userId:
+          type: string
+          format: uuid
+          description: Associated user ID
+        type:
+          type: string
+          enum: [session, mfa, passkey, update-password, validate-email, reset-password]
+          description: Authentication method type
+        credential:
+          type: string
+          description: Encrypted or hashed credential
+        expiresAt:
+          type: string
+          format: date-time
+          description: Expiration timestamp
+        verifiedAt:
+          type: string
+          format: date-time
+          description: Verification timestamp
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation timestamp
+      required:
+        - id
+        - userId
+        - type
+        - credential
+        - createdAt 
