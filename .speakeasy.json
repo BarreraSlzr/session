@@ -1,0 +1,8 @@
+{
+    "$schema": "https://docs.speakeasyapi.dev/schema/v1.json",
+    "openapi": "openapi.yaml",
+    "sdk": {
+      "languages": ["typescript"],
+      "output": "./sdk"
+    }
+  }

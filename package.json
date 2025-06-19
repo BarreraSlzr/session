@@ -13,7 +13,9 @@
     "vercel:env:push": "vercel env pull .env.development.local && vercel env add --yes < .env.development.local",
     "onboard-llm": "bun scripts/onboard-llm.ts",
     "find-todos": "bun scripts/find-todos.ts",
-    "db:typegen": "kysely-codegen --out app/(auth)/lib/types/database.generated.ts"
+    "db:typegen": "kysely-codegen --out app/(auth)/lib/types/database.generated.ts",
+    "speakeasy:validate": "speakeasy validate .speakeasy.json",
+    "speakeasy:generate:sdk": "speakeasy generate sdk .speakeasy.json"
   },
   "engines": {
     "pnpm": ">=3"

@@ -102,3 +102,14 @@ This plan details the integration of Speakeasy CLI into the project to automate 
 **Status**: Planning
 **Owner**: DX Team
 **Review Schedule**: Weekly 
+
+# Speakeasy CLI Integration: Progress Log
+
+This file tracks progress for the [Speakeasy CLI Integration Plan](./01-speakeasy-integration.md).
+
+## Checklist
+
+- [x] Install and configure Speakeasy CLI
+- [x] Add scripts for OpenAPI validation and codegen
+- [ ] Integrate with CI pipeline (to be addressed in next PR)
+- [ ] Automate API docs deployment (future phase)
