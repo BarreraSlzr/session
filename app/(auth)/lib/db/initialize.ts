@@ -1,6 +1,20 @@
 import { CompiledQuery } from "kysely";
-import { db, sql } from "./index";
+import { db, sql } from ".";
 
+/**
+ * Database schema initialization utilities
+ *
+ * This module provides a function to initialize the database schema, including tables and triggers
+ * required for the authentication system. Intended to be called at application startup or during migrations.
+ * 
+ * 
+ * Initializes the database schema by creating tables and triggers if they do not exist.
+ *
+ * - Creates 'user' and 'auth_method' tables with appropriate columns and constraints.
+ * - Adds a trigger to set expiration dates for certain auth methods.
+ *
+ * @returns {Promise<import("../types").Database>} The database instance after initialization.
+ */
 export async function initializeDatabase() {
   // Create User table
   await db.schema
@@ -57,4 +71,3 @@ export async function initializeDatabase() {
   console.log('Database schema initialized.');
   return db;
 }
-

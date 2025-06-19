@@ -1,5 +1,7 @@
 # Project Summary
 
+⚠️ For all enforceable rules and standards, see `.cursor/rules/`. This README is for usage, onboarding, and high-level documentation only.
+
 This project is a user authentication system built with Next.js. It includes various components and hooks to handle user registration, login, password reset, and session management.
 
 ## Main Entities and Relationships
@@ -97,7 +99,6 @@ The following functions use `createAuthMethod` to generate tokens:
 ### Explanation of expiresAt and verifiedAt
 
 For each authentication method, the `expiresAt` field indicates when the token will expire, and the `verifiedAt` field indicates when the token was verified.
-
 
 ## User Authentication Flows
 
