@@ -208,3 +208,59 @@ sequenceDiagram
 ```
 
 The passkey user authentication flow involves generating options, starting authentication or registration, and verifying responses. This flow aligns with other documented authentication methods.
+
+## OpenAPI Specification
+
+This project includes an OpenAPI specification file (`openapi.yaml`) in the root directory. **Whenever you add, change, or remove any API endpoints, you must update `openapi.yaml` to reflect those changes.**
+
+- The OpenAPI file documents all public API endpoints, their request/response formats, and error codes.
+- Code reviews should verify that `openapi.yaml` is kept up to date with the implementation.
+- Keeping this file current ensures accurate API documentation and helps with client/server integration, testing, and onboarding.
+
+## Error Handling
+
+This project uses a centralized error registry (`app/(auth)/lib/errors.ts`) for consistent error handling across all API endpoints.
+
+- **Standardized error codes and messages** for all error scenarios
+- **Proper HTTP status codes** mapped to each error type
+- **Structured error responses** with timestamps and additional details
+- **Type safety** with TypeScript and Zod integration
+- **Automatic error handling** for validation errors and unknown exceptions
+
+For detailed usage instructions and examples, see [docs/error-handling.md](docs/error-handling.md).
+
+**Key benefits:**
+- Consistent error responses across all endpoints
+- Easy client-side error handling with machine-readable codes
+- Simplified debugging with structured error details
+- Type-safe error creation and handling
+
+## Type System
+
+This project uses a centralized type system (`app/(auth)/lib/types/index.ts`) that serves as the single source of truth for all shared types.
+
+- **Database types** from Kysely (User, AuthMethod, etc.)
+- **API request/response types** for all endpoints
+- **Zod schemas** for validation and type inference
+- **Error types** integrated with the error registry
+- **Utility types** for common patterns (pagination, API responses)
+- **Type guards** for runtime type checking
+- **Constants** for configuration and auth method types
+
+For detailed documentation and usage examples, see [docs/type-system.md](docs/type-system.md).
+
+**Key benefits:**
+- Single source of truth for all types across the application
+- Type safety from database to API responses
+- Consistent validation with Zod schemas
+- Easy refactoring with centralized type changes
+- Better IDE support and LLM-friendly documentation
+
+## Changelog Usage
+
+This project uses a `CHANGELOG.md` to track all notable changes. Please follow these steps:
+
+- Before committing any new feature, fix, or breaking change, add an entry to the `Unreleased` section of `CHANGELOG.md`.
+- Use the [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) format for consistency.
+- When preparing a release, move entries from `Unreleased` to a new version section with the release date.
+- Keeping the changelog up to date helps with transparency, onboarding, and release management.

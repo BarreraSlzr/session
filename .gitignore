@@ -11,6 +11,9 @@ node_modules
 # testing
 coverage
 
+# cursor
+.cursor/
+
 # next.js
 .next/
 out/

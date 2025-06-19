@@ -1,5 +1,7 @@
 import { AuthMethod } from "./db/types";
+import { createError } from "./errors";
 
+// Legacy error message mapping for backward compatibility
 export const errorMessages = {
     'Token expired': 'Your token has expired.',
     'Token already verified': 'Your token has already been verified.',
@@ -9,17 +11,16 @@ export const errorMessages = {
 
 export async function handleAuthMethodValidation(authMethod: AuthMethod | undefined) {
     if (!authMethod) {
-        throw new Error('Token error');
+        throw createError.auth.methodNotFound();
     }
     if (isExpired(authMethod.expiresAt)) {
-        throw new Error('Token expired');
+        throw createError.auth.methodExpired();
     }
     if (authMethod.verifiedAt) {
-        throw new Error('Token already verified');
+        throw createError.auth.methodAlreadyVerified();
     }
     return authMethod as AuthMethod;
 }
-
 
 export function isExpired(date: Date | undefined): boolean {
     return !!date && new Date(date) < new Date();
